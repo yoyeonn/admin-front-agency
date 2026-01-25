@@ -1,0 +1,60 @@
+<div class="mb-4 flex items-center justify-between">
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Reservations</h2>
+  <button
+    (click)="load()"
+    class="px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/[0.05]"
+  >
+    Refresh
+  </button>
+</div>
+
+<div *ngIf="error" class="text-red-500 mb-3">{{ error }}</div>
+
+<div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+  <div class="p-4" *ngIf="loading">Loading...</div>
+
+  <div class="p-4" *ngIf="!loading && items.length === 0">
+    <div class="text-sm text-gray-600 dark:text-gray-300">No reservations yet.</div>
+  </div>
+
+  <div class="overflow-x-auto" *ngIf="!loading && items.length > 0">
+    <table class="w-full text-sm">
+      <thead class="border-b border-gray-200 dark:border-gray-800">
+        <tr class="text-left text-gray-600 dark:text-gray-300">
+          <th class="p-3">ID</th>
+          <th class="p-3">Hotel</th>
+          <th class="p-3">User</th>
+          <th class="p-3">Check-in</th>
+          <th class="p-3">Check-out</th>
+          <th class="p-3">Total</th>
+          <th class="p-3"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="let r of items"
+          class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/[0.04]"
+        >
+          <td class="p-3 font-medium text-gray-900 dark:text-white">#{{ r.id }}</td>
+          <td class="p-3">{{ r.hotelName || '—' }}</td>
+          <td class="p-3">
+            <div class="text-gray-900 dark:text-white">{{ r.userName || '—' }}</div>
+            <div class="text-xs text-gray-500">{{ r.userEmail || '' }}</div>
+          </td>
+          <td class="p-3">{{ fmtDate(r.checkIn) }}</td>
+          <td class="p-3">{{ fmtDate(r.checkOut) }}</td>
+          <td class="p-3 font-semibold">{{ money(r.totalAmount) }}</td>
+          <td class="p-3 text-right">
+            <a
+              [routerLink]="['/reservations', r.id]"
+              class="px-3 py-1.5 text-xs rounded-lg bg-brand-500 text-white hover:opacity-90"
+            >
+              Details
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

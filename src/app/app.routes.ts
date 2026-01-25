@@ -18,6 +18,20 @@ import { VideosComponent } from './pages/ui-elements/videos/videos.component';
 import { SignInComponent } from './pages/auth-pages/sign-in/sign-in.component';
 import { SignUpComponent } from './pages/auth-pages/sign-up/sign-up.component';
 import { CalenderComponent } from './pages/calender/calender.component';
+import { HotelsComponent } from './pages/hotels/hotels.component';
+import { HotelDetailComponent } from './pages/hotel-detail/hotel-detail.component';
+import { HotelEditComponent } from './pages/hotel-edit/hotel-edit.component';
+import { HotelCreateComponent } from './pages/hotel-create/hotel-create.component';
+import { DestinationsComponent } from './pages/destinations/destinations.component';
+import { DestinationDetailComponent } from './pages/destination-detail/destination-detail.component';
+import { DestinationCreateComponent } from './pages/destination-create/destination-create.component';
+import { DestinationEditComponent } from './pages/destination-edit/destination-edit.component';
+import { PacksComponent } from './pages/packs/packs.component';
+import { PackCreateComponent } from './pages/pack-create/pack-create.component';
+import { PackDetailComponent } from './pages/pack-detail/pack-detail.component';
+import { PackEditComponent } from './pages/pack-edit/pack-edit.component';
+import { ReservationsComponent } from './pages/reservations/reservations.component';
+import { ReservationDetailComponent } from './pages/reservation-detail/reservation-detail.component';
 
 export const routes: Routes = [
   {
@@ -35,6 +49,76 @@ export const routes: Routes = [
         path:'calendar',
         component:CalenderComponent,
         title:'Angular Calender | TailAdmin - Angular Admin Dashboard Template'
+      },
+      {
+        path: 'hotels',
+        component: HotelsComponent,
+        title: 'Hotels | TailAdmin',
+      },
+      {
+        path: 'hotels/create',
+        component: HotelCreateComponent,
+        title: 'Create Hotel',
+      },
+      {
+        path: 'hotels/:id',
+        component: HotelDetailComponent,
+        title: 'Hotel Details | TailAdmin',
+      },
+      {
+        path: 'hotels/:id/edit',
+        component: HotelEditComponent,
+        title: 'Edit Hotel | TailAdmin',
+      },
+      {
+        path: 'destinations',
+        component: DestinationsComponent,
+        title: 'Destinations | TailAdmin',
+      },
+      {
+        path: 'destinations/create',
+        component: DestinationCreateComponent,
+        title: 'Create Destination',
+      },
+      {
+        path: 'destinations/:id',
+        component: DestinationDetailComponent,
+        title: 'Destination Details | TailAdmin',
+      },
+      {
+        path: 'destinations/:id/edit',
+        component: DestinationEditComponent,
+        title: 'Edit Destination | TailAdmin',
+      },
+      {
+        path: 'packs',
+        component: PacksComponent,
+        title: 'Packs | TailAdmin',
+      },
+      {
+        path: 'packs/create',
+        component: PackCreateComponent,
+        title: 'Create Pack',
+      },
+      {
+        path: 'packs/:id',
+        component: PackDetailComponent,
+        title: 'Pack Details',
+      },
+      {
+        path: 'packs/:id/edit',
+        component: PackEditComponent,
+        title: 'Edit Pack',
+      },
+      {
+        path: 'reservations',
+        component: ReservationsComponent,
+        title: 'Reservations | TailAdmin',
+      },
+      {
+        path: 'reservations/:id',
+        component: ReservationDetailComponent,
+        title: 'Reservation Details | TailAdmin',
       },
       {
         path:'profile',

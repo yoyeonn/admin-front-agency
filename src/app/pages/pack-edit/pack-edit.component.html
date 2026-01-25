@@ -1,0 +1,247 @@
+<!-- Header -->
+<div class="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <div>
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Edit Pack</h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Update pack info and linked hotel/destination.</p>
+  </div>
+
+  <div class="flex flex-wrap gap-2">
+    <button
+      type="button"
+      (click)="save()"
+      [disabled]="saving"
+      class="px-4 py-2 text-sm rounded-lg bg-brand-500 text-white disabled:opacity-60"
+    >
+      {{ saving ? 'Saving...' : 'Save' }}
+    </button>
+
+    <a
+      [routerLink]="['/packs', id]"
+      class="px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/[0.05]"
+    >
+      Cancel
+    </a>
+  </div>
+</div>
+
+<div *ngIf="loading" class="text-gray-500 dark:text-gray-400">Loading...</div>
+<div *ngIf="error" class="text-red-500 mb-3">{{ error }}</div>
+
+<form *ngIf="!loading" [formGroup]="form" class="space-y-4">
+
+  <!-- Main Card -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="grid gap-4 lg:grid-cols-2">
+      <div>
+        <label class="text-sm text-gray-700 dark:text-gray-300">Name</label>
+        <input
+          formControlName="name"
+          class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"
+          placeholder="Pack name"
+        />
+        <div *ngIf="form.get('name')?.touched && form.get('name')?.invalid" class="text-xs text-red-500 mt-1">
+          Name is required.
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-700 dark:text-gray-300">Location</label>
+        <input
+          formControlName="location"
+          class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"
+          placeholder="Location"
+        />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-700 dark:text-gray-300">Price (TND)</label>
+        <input
+          type="number"
+          formControlName="price"
+          class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"
+        />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-700 dark:text-gray-300">Days</label>
+        <input
+          type="number"
+          formControlName="days"
+          class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"
+        />
+      </div>
+
+
+      <div>
+        <label class="text-sm text-gray-700 dark:text-gray-300">Images (comma separated)</label>
+        <input
+          formControlName="imagesText"
+          class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"
+          placeholder="img1.jpg, img2.jpg"
+        />
+      </div>
+    </div>
+
+    <div class="mt-4 grid gap-4 lg:grid-cols-2">
+      <div>
+        <label class="text-sm text-gray-700 dark:text-gray-300">Description</label>
+        <textarea
+          formControlName="description"
+          rows="4"
+          class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"
+        ></textarea>
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-700 dark:text-gray-300">About</label>
+        <textarea
+          formControlName="about"
+          rows="4"
+          class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Link Hotel + Destination -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="grid gap-4 lg:grid-cols-2">
+      <div>
+        <label class="text-sm text-gray-700 dark:text-gray-300">Hotel</label>
+        <select
+          formControlName="hotelId"
+          class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"
+        >
+          <option [ngValue]="null">Select hotel</option>
+          <option *ngFor="let h of hotels" [ngValue]="h.id">
+            {{ h.name }}
+          </option>
+        </select>
+
+        <div class="mt-2 text-xs text-gray-500 dark:text-gray-400" *ngIf="selectedHotel">
+          Selected: <span class="font-medium text-gray-700 dark:text-gray-300">{{ selectedHotel?.name }}</span>
+          <span *ngIf="selectedHotel?.stars"> • ⭐ {{ selectedHotel?.stars }}</span>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-700 dark:text-gray-300">Destination</label>
+        <select
+          formControlName="destinationId"
+          class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"
+        >
+          <option [ngValue]="null">Select destination</option>
+          <option *ngFor="let d of destinations" [ngValue]="d.id">
+            {{ d.name }} ({{ d.country }})
+          </option>
+        </select>
+
+        <div class="mt-2 text-xs text-gray-500 dark:text-gray-400" *ngIf="selectedDestination">
+          Selected: <span class="font-medium text-gray-700 dark:text-gray-300">{{ selectedDestination?.name }}</span>
+          • {{ selectedDestination?.country }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activities -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="mb-3 flex items-center justify-between">
+      <div class="font-medium text-gray-900 dark:text-white">Programme</div>
+      <button type="button" (click)="addActivity()"
+        class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/[0.05]">
+        + Add
+      </button>
+    </div>
+
+    <div class="space-y-3" formArrayName="activities">
+      <div *ngFor="let a of activities.controls; let i=index" [formGroupName]="i"
+        class="rounded-xl border border-gray-200 p-3 dark:border-gray-800">
+        <div class="grid gap-3 md:grid-cols-6">
+          <div class="md:col-span-1">
+            <label class="text-xs text-gray-600 dark:text-gray-400">Day</label>
+            <input type="number" formControlName="day"
+              class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900" />
+          </div>
+
+          <div class="md:col-span-5">
+            <label class="text-xs text-gray-600 dark:text-gray-400">Activity</label>
+            <div class="flex gap-2">
+              <input formControlName="activity"
+                class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900" />
+              <button type="button" (click)="removeActivity(i)"
+                class="mt-1 px-3 py-2 text-xs rounded-lg bg-red-600 text-white disabled:opacity-60">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ + Nearby -->
+  <div class="grid gap-4 lg:grid-cols-2">
+    <!-- FAQ -->
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="mb-3 flex items-center justify-between">
+        <div class="font-medium text-gray-900 dark:text-white">FAQ</div>
+        <button type="button" (click)="addFaq()"
+          class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/[0.05]">
+          + Add
+        </button>
+      </div>
+
+      <div class="space-y-3" formArrayName="faq">
+        <div *ngFor="let f of faq.controls; let i=index" [formGroupName]="i"
+          class="rounded-xl border border-gray-200 p-3 dark:border-gray-800">
+          <label class="text-xs text-gray-600 dark:text-gray-400">Question</label>
+          <input formControlName="question"
+            class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900" />
+
+          <label class="mt-2 block text-xs text-gray-600 dark:text-gray-400">Answer</label>
+          <textarea rows="2" formControlName="answer"
+            class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900"></textarea>
+
+          <div class="mt-2 flex justify-end">
+            <button type="button" (click)="removeFaq(i)"
+              class="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nearby -->
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="mb-3 flex items-center justify-between">
+        <div class="font-medium text-gray-900 dark:text-white">Nearby</div>
+        <button type="button" (click)="addNearby()"
+          class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/[0.05]">
+          + Add
+        </button>
+      </div>
+
+      <div class="space-y-3" formArrayName="nearby">
+        <div *ngFor="let n of nearby.controls; let i=index" [formGroupName]="i"
+          class="rounded-xl border border-gray-200 p-3 dark:border-gray-800">
+          <label class="text-xs text-gray-600 dark:text-gray-400">Name</label>
+          <input formControlName="name"
+            class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900" />
+
+          <label class="mt-2 block text-xs text-gray-600 dark:text-gray-400">Distance (km)</label>
+          <div class="flex gap-2">
+            <input formControlName="distance"
+              class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-800 dark:bg-gray-900" />
+            <button type="button" (click)="removeNearby(i)"
+              class="mt-1 px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</form>

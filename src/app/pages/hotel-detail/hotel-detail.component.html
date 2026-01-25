@@ -1,0 +1,260 @@
+<!-- HEADER -->
+<div class="mb-4 flex items-center justify-between">
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Hotel Details</h2>
+
+  <div class="flex gap-2">
+    <a
+      [routerLink]="['/hotels', id, 'edit']"
+      class="px-4 py-2 text-sm rounded-lg bg-brand-500 text-white"
+    >
+      Edit
+    </a>
+
+    <button
+    type="button"
+    (click)="onDelete()"
+    [disabled]="deleting"
+    class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white disabled:opacity-60 hover:bg-red-700"
+    >
+    {{ deleting ? 'Deleting...' : 'Delete' }}
+    </button>
+
+    <a
+      routerLink="/hotels"
+      class="px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/[0.05]"
+    >
+      Back to list
+    </a>
+  </div>
+</div>
+
+<div *ngIf="loading" class="text-gray-500 dark:text-gray-400">Loading...</div>
+<div *ngIf="error" class="text-red-500 mb-3">{{ error }}</div>
+
+<!-- CONTENT -->
+<div *ngIf="!loading && hotel"
+  class="space-y-4">
+
+  <!-- MAIN CARD -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="flex items-start justify-between gap-4">
+      <div class="min-w-0">
+        <div class="text-xl font-semibold text-gray-900 dark:text-white">
+          {{ hotel.name }}
+        </div>
+
+        <div class="mt-1 text-gray-600 dark:text-gray-300">
+          <span>{{ hotel.city }}</span>
+          <span *ngIf="hotel.city && hotel.country"> - </span>
+          <span>{{ hotel.country }}</span>
+        </div>
+
+        <div class="mt-2 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line" *ngIf="hotel.description">
+          {{ hotel.description }}
+        </div>
+      </div>
+
+      <!-- RIGHT STATS -->
+      <div class="shrink-0 text-right text-sm text-gray-600 dark:text-gray-300 space-y-1">
+        <div *ngIf="hotel.stars">⭐ {{ hotel.stars }}</div>
+        <div *ngIf="hotel.days">{{ hotel.days }} days</div>
+        <div *ngIf="hotel.location">{{ hotel.location }}</div>
+        <div *ngIf="hotel.bestTimeToVisit">Best time: {{ hotel.bestTimeToVisit }}</div>
+      </div>
+    </div>
+
+    <!-- IMAGES GRID -->
+    <div class="mt-4" *ngIf="(hotel.images?.length ?? 0) > 0">
+      <div class="mb-2 flex items-center justify-between">
+        <div class="font-medium text-gray-900 dark:text-white">Images</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          {{ hotel.images?.length ?? 0 }} photos
+        </div>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <img
+          *ngFor="let img of hotel.images"
+          [src]="img"
+          alt="hotel image"
+          class="h-40 w-full rounded-xl object-cover border border-gray-200 dark:border-gray-800"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT + POLICIES -->
+  <div class="grid gap-4 lg:grid-cols-2">
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="font-medium text-gray-900 dark:text-white mb-2">About</div>
+      <div class="text-gray-700 dark:text-gray-300 text-sm whitespace-pre-line">
+        {{ hotel.about || '-' }}
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div class="font-medium text-gray-900 dark:text-white mb-2">Policies</div>
+
+      <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+        <div><span class="font-medium">Cancellation:</span> {{ hotel.cancellationPolicy || '-' }}</div>
+        <div><span class="font-medium">Available dates:</span> {{ hotel.availableDates || '-' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIGHLIGHTS -->
+  <div
+    class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+    *ngIf="(hotel.highlights?.length ?? 0) > 0"
+  >
+    <div class="mb-2 flex items-center justify-between">
+      <div class="font-medium text-gray-900 dark:text-white">Highlights</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400">{{ hotel.highlights?.length ?? 0 }} items</div>
+    </div>
+
+    <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+      <li *ngFor="let h of hotel.highlights">{{ h }}</li>
+    </ul>
+  </div>
+
+  <!-- INCLUDES / EXCLUDES -->
+  <div class="grid gap-4 lg:grid-cols-2">
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+      *ngIf="(hotel.includes?.length ?? 0) > 0"
+    >
+      <div class="font-medium text-gray-900 dark:text-white mb-2">Includes</div>
+      <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+        <li *ngFor="let x of hotel.includes">{{ x }}</li>
+      </ul>
+    </div>
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+      *ngIf="(hotel.excludes?.length ?? 0) > 0"
+    >
+      <div class="font-medium text-gray-900 dark:text-white mb-2">Excludes</div>
+      <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+        <li *ngFor="let x of hotel.excludes">{{ x }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TIPS / SUITED -->
+  <div class="grid gap-4 lg:grid-cols-2">
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+      *ngIf="(hotel.travelTips?.length ?? 0) > 0"
+    >
+      <div class="font-medium text-gray-900 dark:text-white mb-2">Travel Tips</div>
+      <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+        <li *ngFor="let t of hotel.travelTips">{{ t }}</li>
+      </ul>
+    </div>
+
+    <div
+      class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+      *ngIf="(hotel.suitedFor?.length ?? 0) > 0"
+    >
+      <div class="font-medium text-gray-900 dark:text-white mb-2">Suited For</div>
+      <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+        <li *ngFor="let s of hotel.suitedFor">{{ s }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ROOMS -->
+  <div
+    class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+    *ngIf="(hotel.rooms?.length ?? 0) > 0"
+  >
+    <div class="mb-2 flex items-center justify-between">
+      <div class="font-medium text-gray-900 dark:text-white">Rooms</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400">{{ hotel.rooms?.length ?? 0 }} rooms</div>
+    </div>
+
+    <div class="grid gap-3 md:grid-cols-2">
+      <div
+        *ngFor="let r of hotel.rooms"
+        class="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+      >
+        <div class="flex gap-3">
+          <img
+            *ngIf="r.image"
+            [src]="r.image"
+            alt="room"
+            class="h-16 w-16 rounded-lg object-cover border border-gray-200 dark:border-gray-800"
+          />
+
+          <div class="min-w-0">
+            <div class="font-medium text-gray-900 dark:text-white">{{ r.name }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-300" *ngIf="r.description">
+              {{ r.description }}
+            </div>
+            <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">
+              Capacity: {{ r.capacity }} • Price: {{ r.price }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRAMME -->
+  <div
+    class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+    *ngIf="(hotel.programme?.length ?? 0) > 0"
+  >
+    <div class="mb-2 flex items-center justify-between">
+      <div class="font-medium text-gray-900 dark:text-white">Programme</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400">{{ hotel.programme?.length ?? 0 }} items</div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="text-left text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
+          <tr>
+            <th class="py-3 pr-4">Day</th>
+            <th class="py-3 pr-4">Activity</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let p of hotel.programme" class="border-b border-gray-100 dark:border-gray-800">
+            <td class="py-3 pr-4">Day {{ p.day }}</td>
+            <td class="py-3 pr-4 text-gray-700 dark:text-gray-300">{{ p.activity }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- NEARBY -->
+  <div
+    class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+    *ngIf="(hotel.nearby?.length ?? 0) > 0"
+  >
+    <div class="font-medium text-gray-900 dark:text-white mb-2">Nearby</div>
+    <ul class="text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+      <li *ngFor="let n of hotel.nearby">
+        <span class="font-medium">{{ n.name }}</span> — {{ n.distance }}
+      </li>
+    </ul>
+  </div>
+
+  <!-- FAQ -->
+  <div
+    class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+    *ngIf="(hotel.faq?.length ?? 0) > 0"
+  >
+    <div class="font-medium text-gray-900 dark:text-white mb-2">FAQ</div>
+
+    <div class="space-y-2">
+      <div *ngFor="let f of hotel.faq" class="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+        <div class="font-medium text-gray-900 dark:text-white">{{ f.question }}</div>
+        <div class="text-gray-700 dark:text-gray-300 mt-1 text-sm">{{ f.answer }}</div>
+      </div>
+    </div>
+  </div>
+
+</div>

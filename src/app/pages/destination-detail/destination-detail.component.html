@@ -1,0 +1,246 @@
+<!-- Header -->
+<div class="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <div>
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+      Destination Details
+    </h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400">
+      View full destination information and manage it.
+    </p>
+  </div>
+
+  <div class="flex flex-wrap gap-2">
+    <a
+      [routerLink]="['/destinations', id, 'edit']"
+      class="px-4 py-2 text-sm rounded-lg bg-brand-500 text-white hover:opacity-90"
+    >
+      Edit
+    </a>
+
+    <button
+      type="button"
+      (click)="deleteDestination()"
+      [disabled]="deleting"
+      class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+    >
+      {{ deleting ? 'Deleting...' : 'Delete' }}
+    </button>
+
+    <a
+      routerLink="/destinations"
+      class="px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/[0.05]"
+    >
+      Back to list
+    </a>
+  </div>
+</div>
+
+<div *ngIf="loading" class="text-gray-500 dark:text-gray-400">Loading...</div>
+<div *ngIf="error" class="text-red-500 mb-3">{{ error }}</div>
+
+<!-- Content -->
+<div *ngIf="!loading && destination" class="space-y-4">
+  <!-- Hero Card -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-2">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white truncate">
+            {{ destination.name }}
+          </h3>
+
+          <span
+            class="inline-flex items-center rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-300"
+          >
+            {{ destination.country }}
+          </span>
+
+          <span
+            *ngIf="destination.location"
+            class="inline-flex items-center rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-300"
+          >
+            {{ destination.location }}
+          </span>
+
+          <span
+            class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700 dark:bg-white/[0.06] dark:text-gray-300"
+          >
+            {{ destination.days }} days
+          </span>
+        </div>
+
+        <p *ngIf="destination.title" class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+          {{ destination.title }}
+        </p>
+
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span
+            *ngIf="destination.availableFrom"
+            class="inline-flex items-center rounded-lg border border-gray-200 px-3 py-1 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-300"
+          >
+            From: {{ destination.availableFrom }}
+          </span>
+          <span
+            *ngIf="destination.availableTo"
+            class="inline-flex items-center rounded-lg border border-gray-200 px-3 py-1 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-300"
+          >
+            To: {{ destination.availableTo }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Price box -->
+      <div class="w-full lg:w-[280px] rounded-2xl border border-gray-200 p-4 dark:border-gray-800">
+        <div class="text-xs text-gray-500 dark:text-gray-400">Price</div>
+        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+          {{ destination.price }} TND
+        </div>
+        <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          Per person
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Images -->
+  <div
+    class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+    *ngIf="destination.images?.length"
+  >
+    <div class="mb-3 flex items-center justify-between">
+      <h4 class="text-base font-semibold text-gray-900 dark:text-white">Images</h4>
+      <span class="text-xs text-gray-500 dark:text-gray-400">
+        {{ destination.images?.length }} photos
+      </span>
+    </div>
+
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <a
+        *ngFor="let img of destination.images"
+        [href]="img"
+        target="_blank"
+        class="group block overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+      >
+        <img
+          [src]="img"
+          class="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          alt="destination image"
+        />
+      </a>
+    </div>
+  </div>
+
+  <!-- About + Description -->
+  <div class="grid gap-4 lg:grid-cols-2">
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <h4 class="text-base font-semibold text-gray-900 dark:text-white">About</h4>
+      <p class="mt-2 text-sm leading-6 text-gray-700 dark:text-gray-300 whitespace-pre-line">
+        {{ destination.about || '—' }}
+      </p>
+    </div>
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      <h4 class="text-base font-semibold text-gray-900 dark:text-white">Description</h4>
+      <p class="mt-2 text-sm leading-6 text-gray-700 dark:text-gray-300 whitespace-pre-line">
+        {{ destination.description || '—' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Activities -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+       *ngIf="destination.activities?.length">
+    <div class="mb-3 flex items-center justify-between">
+      <h4 class="text-base font-semibold text-gray-900 dark:text-white">Programme</h4>
+      <span class="text-xs text-gray-500 dark:text-gray-400">
+        {{ destination.activities?.length }} items
+      </span>
+    </div>
+
+    <div class="space-y-2">
+      <div
+        *ngFor="let a of destination.activities"
+        class="flex items-start gap-3 rounded-xl border border-gray-200 p-3 dark:border-gray-800"
+      >
+        <span class="min-w-[70px] rounded-lg bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700 dark:bg-white/[0.06] dark:text-gray-200">
+          Day {{ a.day }}
+        </span>
+        <div class="text-sm text-gray-800 dark:text-gray-200">
+          {{ a.activity }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nearby + FAQ -->
+  <div class="grid gap-4 lg:grid-cols-2">
+    <!-- Nearby -->
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+         *ngIf="destination.nearby?.length">
+      <h4 class="text-base font-semibold text-gray-900 dark:text-white">Nearby</h4>
+
+      <div class="mt-3 divide-y divide-gray-100 dark:divide-gray-800">
+        <div *ngFor="let n of destination.nearby" class="flex items-center justify-between py-3">
+          <div class="text-sm font-medium text-gray-900 dark:text-white">
+            {{ n.name }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-300">
+            {{ n.distance }} km
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+         *ngIf="destination.faq?.length">
+      <h4 class="text-base font-semibold text-gray-900 dark:text-white">FAQ</h4>
+
+      <div class="mt-3 space-y-2">
+        <details
+          *ngFor="let f of destination.faq"
+          class="group rounded-xl border border-gray-200 p-3 dark:border-gray-800"
+        >
+          <summary class="cursor-pointer list-none flex items-center justify-between gap-3">
+            <span class="text-sm font-medium text-gray-900 dark:text-white">
+              {{ f.question }}
+            </span>
+            <span class="text-gray-400 group-open:rotate-180 transition-transform">⌄</span>
+          </summary>
+          <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+            {{ f.answer }}
+          </p>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+       *ngIf="destination.reviews?.length">
+    <div class="mb-3 flex items-center justify-between">
+      <h4 class="text-base font-semibold text-gray-900 dark:text-white">Reviews</h4>
+      <span class="text-xs text-gray-500 dark:text-gray-400">
+        {{ destination.reviews?.length }} reviews
+      </span>
+    </div>
+
+    <div class="grid gap-3 md:grid-cols-2">
+      <div *ngFor="let r of destination.reviews" class="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+        <div class="flex items-center justify-between">
+          <div class="text-sm font-semibold text-gray-900 dark:text-white">
+            {{ r.name }}
+          </div>
+
+          <span class="inline-flex items-center rounded-lg bg-gray-100 px-2 py-0.5 text-xs text-gray-700 dark:bg-white/[0.06] dark:text-gray-200">
+            ★ {{ r.stars }}
+          </span>
+        </div>
+
+        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+          {{ r.comment || '—' }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
