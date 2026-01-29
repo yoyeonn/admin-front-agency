@@ -16,7 +16,6 @@ import { ButtonsComponent } from './pages/ui-elements/buttons/buttons.component'
 import { ImagesComponent } from './pages/ui-elements/images/images.component';
 import { VideosComponent } from './pages/ui-elements/videos/videos.component';
 import { SignInComponent } from './pages/auth-pages/sign-in/sign-in.component';
-import { SignUpComponent } from './pages/auth-pages/sign-up/sign-up.component';
 import { CalenderComponent } from './pages/calender/calender.component';
 import { HotelsComponent } from './pages/hotels/hotels.component';
 import { HotelDetailComponent } from './pages/hotel-detail/hotel-detail.component';
@@ -34,11 +33,13 @@ import { ReservationsComponent } from './pages/reservations/reservations.compone
 import { ReservationDetailComponent } from './pages/reservation-detail/reservation-detail.component';
 import { DestinationReservationDetailComponent } from './pages/destination-reservation-detail/destination-reservation-detail.component';
 import { PackReservationDetailComponent } from './pages/pack-reservation-detail/pack-reservation-detail.component';
+import { adminGuard } from './shared/guards/admin.guard';
 
 export const routes: Routes = [
   {
     path:'',
     component:AppLayoutComponent,
+    canActivate:[adminGuard],
     children:[
       {
         path: '',
@@ -205,11 +206,6 @@ export const routes: Routes = [
     path:'signin',
     component:SignInComponent,
     title:'Angular Sign In Dashboard | TailAdmin - Angular Admin Dashboard Template'
-  },
-  {
-    path:'signup',
-    component:SignUpComponent,
-    title:'Angular Sign Up Dashboard | TailAdmin - Angular Admin Dashboard Template'
   },
   // error pages
   {

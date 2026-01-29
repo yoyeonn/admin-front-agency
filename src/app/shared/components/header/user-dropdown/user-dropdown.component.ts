@@ -12,6 +12,9 @@ import { DropdownItemTwoComponent } from '../../ui/dropdown/dropdown-item/dropdo
 export class UserDropdownComponent {
   isOpen = false;
 
+  get name() { return localStorage.getItem('name') ?? 'Admin'; }
+  get email() { return localStorage.getItem('email') ?? ''; }
+
   toggleDropdown() {
     this.isOpen = !this.isOpen;
   }

@@ -1,9 +1,15 @@
-
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import flatpickr from 'flatpickr';
 import { Instance } from 'flatpickr/dist/types/instance';
-import { NgApexchartsModule } from 'ng-apexcharts';
-
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -16,44 +22,24 @@ import {
   ApexTooltip,
   ApexXAxis,
   ApexYAxis,
+  NgApexchartsModule,
 } from 'ng-apexcharts';
+
 import { ChartTabComponent } from '../../common/chart-tab/chart-tab.component';
+import { DashboardData } from '../../../services/dashboard.service';
 
 @Component({
   selector: 'app-statics-chart',
-  imports: [NgApexchartsModule, ChartTabComponent],
+  standalone: true,
+  imports: [CommonModule, NgApexchartsModule, ChartTabComponent],
   templateUrl: './statics-chart.component.html',
 })
-export class StatisticsChartComponent implements AfterViewInit {
+export class StatisticsChartComponent implements AfterViewInit, OnChanges {
+  @Input() data: DashboardData | null = null;
   @ViewChild('datepicker') datepicker!: ElementRef<HTMLInputElement>;
 
-  ngAfterViewInit() {
-    flatpickr(this.datepicker.nativeElement, {
-      mode: 'range',
-      static: true,
-      monthSelectorType: 'static',
-      dateFormat: 'M j',
-      defaultDate: [new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), new Date()],
-      onReady: (selectedDates: Date[], dateStr: string, instance: Instance) => {
-        (instance.element as HTMLInputElement).value = dateStr.replace('to', '-');
-        const customClass = instance.element.getAttribute('data-class');
-        instance.calendarContainer?.classList.add(customClass!);
-      },
-      onChange: (selectedDates: Date[], dateStr: string, instance: Instance) => {
-        (instance.element as HTMLInputElement).value = dateStr.replace('to', '-');
-      },
-    });
-  }
-  public series: ApexAxisChartSeries = [
-    {
-      name: 'Sales',
-      data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
-    },
-    {
-      name: 'Revenue',
-      data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
-    },
-  ];
+  // ✅ Default config (works even before API data arrives)
+  public series: ApexAxisChartSeries = [{ name: 'Revenue', data: [] }];
 
   public chart: ApexChart = {
     fontFamily: 'Outfit, sans-serif',
@@ -62,19 +48,13 @@ export class StatisticsChartComponent implements AfterViewInit {
     toolbar: { show: false },
   };
 
-  public colors: string[] = ['#465FFF', '#9CB9FF'];
+  public colors: string[] = ['#465FFF'];
 
-  public stroke: ApexStroke = {
-    curve: 'straight',
-    width: [2, 2],
-  };
+  public stroke: ApexStroke = { curve: 'straight', width: 2 };
 
   public fill: ApexFill = {
     type: 'gradient',
-    gradient: {
-      opacityFrom: 0.55,
-      opacityTo: 0,
-    },
+    gradient: { opacityFrom: 0.55, opacityTo: 0 },
   };
 
   public markers: ApexMarkers = {
@@ -93,46 +73,47 @@ export class StatisticsChartComponent implements AfterViewInit {
 
   public tooltip: ApexTooltip = {
     enabled: true,
-    x: { format: 'dd MMM yyyy' },
+    x: { format: 'yyyy-MM-dd' },
   };
 
   public xaxis: ApexXAxis = {
     type: 'category',
-    categories: [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ],
+    categories: [],
     axisBorder: { show: false },
     axisTicks: { show: false },
     tooltip: { enabled: false },
   };
 
   public yaxis: ApexYAxis = {
-    labels: {
-      style: {
-        fontSize: '12px',
-        colors: ['#6B7280'],
-      },
-    },
-    title: {
-      text: '',
-      style: { fontSize: '0px' },
-    },
+    title: { text: '', style: { fontSize: '0px' } },
   };
 
-  public legend: ApexLegend = {
-    show: false,
-    position: 'top',
-    horizontalAlign: 'left',
-  };
+  public legend: ApexLegend = { show: false };
+
+  ngAfterViewInit(): void {
+    flatpickr(this.datepicker.nativeElement, {
+      mode: 'range',
+      static: true,
+      monthSelectorType: 'static',
+      dateFormat: 'M j',
+      defaultDate: [new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), new Date()],
+      onReady: (_selectedDates: Date[], dateStr: string, instance: Instance) => {
+        (instance.element as HTMLInputElement).value = dateStr.replace('to', '-');
+        const customClass = instance.element.getAttribute('data-class');
+        if (customClass) instance.calendarContainer?.classList.add(customClass);
+      },
+      onChange: (_selectedDates: Date[], dateStr: string, instance: Instance) => {
+        (instance.element as HTMLInputElement).value = dateStr.replace('to', '-');
+      },
+    });
+  }
+
+  ngOnChanges(_changes: SimpleChanges): void {
+    const stats = this.data?.statistics ?? [];
+    const labels = stats.map((x) => x.label);
+    const values = stats.map((x) => Number(x.value ?? 0));
+
+    this.xaxis = { ...this.xaxis, categories: labels };
+    this.series = [{ name: 'Revenue', data: values }];
+  }
 }

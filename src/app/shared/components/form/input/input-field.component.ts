@@ -67,7 +67,9 @@ export class InputFieldComponent {
   }
 
   onInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.valueChange.emit(this.type === 'number' ? +input.value : input.value);
-  }
+  const input = event.target as HTMLInputElement;
+  const v = this.type === 'number' ? +input.value : input.value;
+  this.value = v;
+  this.valueChange.emit(v);
+}
 }
