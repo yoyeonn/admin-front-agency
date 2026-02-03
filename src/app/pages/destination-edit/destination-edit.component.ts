@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DestinationDTO } from '../../shared/models/destination-dto';
@@ -11,14 +11,18 @@ import { DestinationService } from '../../shared/services/destination.service';
   templateUrl: './destination-edit.component.html',
   styleUrl: './destination-edit.component.css',
 })
-export class DestinationEditComponent implements OnInit{
-id!: number;
+export class DestinationEditComponent implements OnInit, OnDestroy {
+  id!: number;
   loading = false;
   saving = false;
   error: string | null = null;
 
   destination: DestinationDTO | null = null;
   form!: FormGroup;
+
+  // ✅ like hotel
+  selectedImages: File[] = [];
+  previewUrls: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -47,8 +51,6 @@ id!: number;
       availableTo: [''],
       description: [''],
       about: [''],
-
-      imagesText: [''],
 
       activities: this.fb.array([]),
       nearby: this.fb.array([]),
@@ -87,15 +89,28 @@ id!: number;
   }
 
   newReview(r?: any): FormGroup {
-    return this.fb.group({
-      name: [r?.name ?? '', Validators.required],
-      stars: [r?.stars ?? 5],
-      comment: [r?.comment ?? ''],
-    });
-  }
+  return this.fb.group({
+    name: [{ value: r?.name ?? '', disabled: true }],
+    stars: [{ value: r?.stars ?? 5, disabled: true }],
+    comment: [{ value: r?.comment ?? '', disabled: true }],
+  });
+}
 
-  addActivity() { this.activities.push(this.newActivity()); }
-  removeActivity(i: number) { this.activities.removeAt(i); }
+  addActivity() {
+  const lastDay =
+    this.activities.length > 0
+      ? Number(this.activities.at(this.activities.length - 1).get('day')?.value ?? this.activities.length)
+      : 0;
+
+  this.activities.push(this.newActivity({ day: lastDay + 1 }));
+}
+  removeActivity(i: number) {
+  this.activities.removeAt(i);
+
+  this.activities.controls.forEach((ctrl, idx) => {
+    ctrl.get('day')?.setValue(idx + 1);
+  });
+}
 
   addNearby() { this.nearby.push(this.newNearby()); }
   removeNearby(i: number) { this.nearby.removeAt(i); }
@@ -103,7 +118,6 @@ id!: number;
   addFaq() { this.faq.push(this.newFaq()); }
   removeFaq(i: number) { this.faq.removeAt(i); }
 
-  addReview() { this.reviews.push(this.newReview()); }
   removeReview(i: number) { this.reviews.removeAt(i); }
 
   fetchDestination(): void {
@@ -125,7 +139,6 @@ id!: number;
           availableTo: d.availableTo ?? '',
           description: d.description ?? '',
           about: d.about ?? '',
-          imagesText: (d.images ?? []).join(', '),
         });
 
         this.activities.clear();
@@ -133,10 +146,10 @@ id!: number;
         this.faq.clear();
         this.reviews.clear();
 
-        (d.activities ?? []).forEach(a => this.activities.push(this.newActivity(a)));
-        (d.nearby ?? []).forEach(n => this.nearby.push(this.newNearby(n)));
-        (d.faq ?? []).forEach(f => this.faq.push(this.newFaq(f)));
-        (d.reviews ?? []).forEach(r => this.reviews.push(this.newReview(r)));
+        (d.activities ?? []).forEach((a) => this.activities.push(this.newActivity(a)));
+        (d.nearby ?? []).forEach((n) => this.nearby.push(this.newNearby(n)));
+        (d.faq ?? []).forEach((f) => this.faq.push(this.newFaq(f)));
+        (d.reviews ?? []).forEach((r) => this.reviews.push(this.newReview(r)));
 
         this.loading = false;
       },
@@ -147,10 +160,45 @@ id!: number;
     });
   }
 
-  private csvToList(v: unknown): string[] {
-    const s = (v ?? '').toString().trim();
-    if (!s) return [];
-    return s.split(',').map(x => x.trim()).filter(Boolean);
+  // ✅ images handlers (like hotel)
+  onFilesSelected(files: FileList | null) {
+    if (!files?.length) return;
+
+    Array.from(files).forEach((file) => {
+      this.selectedImages.push(file);
+      this.previewUrls.push(URL.createObjectURL(file));
+    });
+  }
+
+  removeSelectedImage(i: number) {
+    URL.revokeObjectURL(this.previewUrls[i]);
+    this.previewUrls.splice(i, 1);
+    this.selectedImages.splice(i, 1);
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.onFilesSelected(event.dataTransfer?.files ?? null);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  removeExistingImage(i: number) {
+    if (!this.destination) return;
+
+    const ok = confirm('Remove this image?');
+    if (!ok) return;
+
+    this.destinationService.deleteDestinationImage(this.id, i).subscribe({
+      next: (updated) => {
+        this.destination = updated;
+      },
+      error: (err) => {
+        alert(err?.error?.message || err?.message || 'Delete image failed');
+      },
+    });
   }
 
   save(): void {
@@ -164,6 +212,7 @@ id!: number;
 
     const v = this.form.value;
 
+    // ✅ IMPORTANT: do NOT send images in update payload
     const payload: Partial<DestinationDTO> = {
       name: v.name ?? '',
       country: v.country ?? '',
@@ -171,30 +220,52 @@ id!: number;
       title: v.title ?? '',
       price: Number(v.price ?? 0),
       days: Number(v.days ?? 1),
-
       availableFrom: v.availableFrom ?? null,
       availableTo: v.availableTo ?? null,
-
       description: v.description ?? '',
       about: v.about ?? '',
-
-      images: this.csvToList(v.imagesText),
 
       activities: this.activities.value,
       nearby: this.nearby.value,
       faq: this.faq.value,
-      reviews: this.reviews.value,
     };
 
+    // 1) update destination fields
     this.destinationService.updateDestination(this.id, payload).subscribe({
       next: () => {
-        this.saving = false;
-        this.router.navigate(['/destinations', this.id]);
+        // 2) if no new images selected => done
+        if (this.selectedImages.length === 0) {
+          this.saving = false;
+          this.router.navigate(['/destinations', this.id]);
+          return;
+        }
+
+        // 3) upload selected images
+        this.destinationService.uploadDestinationImages(this.id, this.selectedImages).subscribe({
+          next: (updated) => {
+            this.destination = updated;
+
+            this.previewUrls.forEach((u) => URL.revokeObjectURL(u));
+            this.previewUrls = [];
+            this.selectedImages = [];
+
+            this.saving = false;
+            this.router.navigate(['/destinations', this.id]);
+          },
+          error: (err) => {
+            this.saving = false;
+            this.error = err?.error?.message || err?.message || 'Image upload failed';
+          },
+        });
       },
       error: (err) => {
         this.saving = false;
         this.error = err?.error?.message || err?.message || 'Update failed';
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.previewUrls.forEach((u) => URL.revokeObjectURL(u));
   }
 }

@@ -1,42 +1,56 @@
-import { Component } from '@angular/core';
-import { ModalService } from '../../../services/modal.service';
-
-import { InputFieldComponent } from '../../form/input/input-field.component';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { AdminProfile, AdminProfileService } from '../../../services/admin-profile.service';
+import { ModalComponent } from '../../ui/modal/modal.component';
 import { ButtonComponent } from '../../ui/button/button.component';
 import { LabelComponent } from '../../form/label/label.component';
-import { ModalComponent } from '../../ui/modal/modal.component';
-import { FormsModule } from '@angular/forms';
+import { InputFieldComponent } from '../../form/input/input-field.component';
 
 @Component({
   selector: 'app-user-address-card',
-  imports: [
-    InputFieldComponent,
-    ButtonComponent,
-    LabelComponent,
-    ModalComponent,
-    FormsModule
-],
+  standalone: true,
+  imports: [ModalComponent, ButtonComponent, LabelComponent, InputFieldComponent, FormsModule],
   templateUrl: './user-address-card.component.html',
-  styles: ``
 })
 export class UserAddressCardComponent {
-
-  constructor(public modal: ModalService) {}
+  @Input() profile!: AdminProfile;
+  @Output() profileUpdated = new EventEmitter<AdminProfile>();
 
   isOpen = false;
-  openModal() { this.isOpen = true; }
-  closeModal() { this.isOpen = false; }
 
-  address = {
-    country: 'United States.',
-    cityState: 'Phoenix, Arizona, United States.',
-    postalCode: 'ERT 2489',
-    taxId: 'AS4568384',
+  editAddress = {
+    country: '',
+    cityState: '',
+    postalCode: '',
   };
 
+  constructor(private adminProfileService: AdminProfileService) {}
+
+  openModal() {
+    this.editAddress = {
+      country: this.profile?.country ?? '',
+      cityState: this.profile?.cityState ?? '',
+      postalCode: this.profile?.postalCode ?? '',
+    };
+    this.isOpen = true;
+  }
+
+  closeModal() {
+    this.isOpen = false;
+  }
+
   handleSave() {
-    // Handle save logic here
-    console.log('Saving changes...');
-    this.modal.closeModal();
+    this.adminProfileService.updateMyProfile({
+      name: this.profile.name, // keep same name
+      country: this.editAddress.country,
+      cityState: this.editAddress.cityState,
+      postalCode: this.editAddress.postalCode,
+    }).subscribe({
+      next: (updated) => {
+        this.profileUpdated.emit(updated);
+        this.closeModal();
+      },
+      error: (err) => console.error('Update address failed', err),
+    });
   }
 }

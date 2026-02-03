@@ -28,6 +28,7 @@
   [formGroup]="form"
   class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
 >
+  <!-- BASIC INFO -->
   <div class="grid gap-4 md:grid-cols-2">
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Name *</label>
@@ -105,6 +106,7 @@
     ></textarea>
   </div>
 
+  <!-- POLICIES -->
   <div class="grid gap-4 md:grid-cols-2 mt-4">
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Cancellation Policy</label>
@@ -134,6 +136,7 @@
     </div>
   </div>
 
+  <!-- LIST FIELDS + IMAGES -->
   <div class="grid gap-4 md:grid-cols-2 mt-4">
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Highlights (comma separated)</label>
@@ -141,15 +144,6 @@
         rows="3"
         class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
         formControlName="highlightsText"
-      ></textarea>
-    </div>
-
-    <div>
-      <label class="text-sm text-gray-600 dark:text-gray-300">Images URLs (comma separated)</label>
-      <textarea
-        rows="3"
-        class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-        formControlName="imagesText"
       ></textarea>
     </div>
 
@@ -188,172 +182,355 @@
         formControlName="travelTipsText"
       ></textarea>
     </div>
+
+    <!-- ✅ HOTEL IMAGE (1 ONLY) -->
+    <div class="md:col-span-2 mt-2">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white">Hotel Image (1)</h3>
+
+        <input
+          #fileInput
+          type="file"
+          accept="image/*"
+          class="hidden"
+          (change)="onFilesSelected($event.target.files)"
+        />
+
+        <button
+          type="button"
+          (click)="fileInput.click()"
+          class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white"
+        >
+          Choose image
+        </button>
+      </div>
+
+      <div
+        class="mt-3 rounded-xl border-2 border-dashed border-gray-200 p-6 text-center dark:border-gray-800"
+        (drop)="onDrop($event)"
+        (dragover)="onDragOver($event)"
+      >
+        <div class="text-sm text-gray-600 dark:text-gray-300">
+          Drag & drop an image here, or click “Choose image”
+        </div>
+        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          Only 1 image allowed (new selection replaces old)
+        </div>
+      </div>
+
+      <!-- NEW IMAGE PREVIEW -->
+      <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" *ngIf="previewUrls.length > 0">
+        <div *ngFor="let url of previewUrls; let i = index" class="relative">
+          <img
+            [src]="url"
+            class="h-40 w-full rounded-xl object-cover border border-gray-200 dark:border-gray-800"
+            alt="preview"
+          />
+          <button
+            type="button"
+            (click)="removeSelectedImage(i)"
+            class="absolute top-2 right-2 px-2 py-1 text-xs rounded bg-red-600 text-white"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <!-- EXISTING IMAGE -->
+      <div class="mt-5" *ngIf="(hotel?.images?.length ?? 0) > 0">
+        <div class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Existing image
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div *ngFor="let img of hotel!.images; let i = index" class="relative">
+            <img
+              [src]="img"
+              class="h-40 w-full rounded-xl object-cover border border-gray-200 dark:border-gray-800"
+              alt="existing"
+            />
+
+            <button
+              type="button"
+              (click)="removeExistingImage(i)"
+              class="absolute top-2 right-2 px-2 py-1 text-xs rounded bg-red-600 text-white"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOMS -->
+  <div class="mt-6">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-semibold text-gray-900 dark:text-white">Rooms</h3>
+      <button type="button" (click)="addRoom()" class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white">
+        + Add Room
+      </button>
     </div>
 
-    <div class="mt-6">
+    <div formArrayName="rooms" class="mt-3 space-y-3">
+      <div
+        *ngFor="let r of rooms.controls; let i = index"
+        [formGroupName]="i"
+        class="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+      >
+        <div class="grid gap-3 md:grid-cols-2">
+          <div>
+            <label class="text-sm text-gray-600 dark:text-gray-300">Room Name *</label>
+            <input
+              class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+              formControlName="name"
+            />
+          </div>
+
+          <!-- ✅ ROOM IMAGE (1 only) -->
+          <!-- ✅ ROOM IMAGE (1 only) - HOTEL STYLE -->
+<div class="md:col-span-2">
   <div class="flex items-center justify-between">
-    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Rooms</h3>
-    <button type="button" (click)="addRoom()" class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white">
-      + Add Room
+    <label class="text-sm text-gray-600 dark:text-gray-300">Room Image (1 only)</label>
+
+    <!-- hidden input -->
+    <input
+      #roomFileInput
+      type="file"
+      accept="image/*"
+      class="hidden"
+      (change)="onRoomFileSelected(i, $event.target.files)"
+    />
+
+    <button
+      type="button"
+      (click)="roomFileInput.click()"
+      class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white"
+    >
+      Choose image
     </button>
   </div>
 
-  <div formArrayName="rooms" class="mt-3 space-y-3">
-    <div
-      *ngFor="let r of rooms.controls; let i = index"
-      [formGroupName]="i"
-      class="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
-    >
-      <div class="grid gap-3 md:grid-cols-2">
-        <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Room Name *</label>
-          <input class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                 formControlName="name" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Image URL</label>
-          <input class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                 formControlName="image" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Capacity</label>
-          <input type="number"
-                 class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                 formControlName="capacity" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Price</label>
-          <input type="number"
-                 class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                 formControlName="price" />
-        </div>
-      </div>
-
-      <div class="mt-3">
-        <label class="text-sm text-gray-600 dark:text-gray-300">Description</label>
-        <textarea rows="2"
-                  class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                  formControlName="description"></textarea>
-      </div>
-
-      <div class="mt-3 flex justify-end">
-        <button type="button" (click)="removeRoom(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
-          Remove
-        </button>
-      </div>
+  <!-- Dropzone -->
+  <div
+    class="mt-3 rounded-xl border-2 border-dashed border-gray-200 p-6 text-center dark:border-gray-800"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    (drop)="onRoomFileSelected(i, $event.dataTransfer?.files ?? null); $event.preventDefault()"
+    (dragover)="$event.preventDefault()"
+  >
+    <div class="text-sm text-gray-600 dark:text-gray-300">
+      Drag & drop an image here, or click “Choose image”
+    </div>
+    <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+      Only 1 image allowed (new selection replaces old)
     </div>
   </div>
-</div>
 
-<div class="mt-6">
-  <div class="flex items-center justify-between">
-    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Nearby</h3>
-    <button type="button" (click)="addNearby()" class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white">
-      + Add Nearby
-    </button>
-  </div>
+  <!-- EXISTING IMAGE -->
+  <div class="mt-3" *ngIf="r.get('image')?.value">
+    <div class="mb-2 text-xs font-medium text-gray-900 dark:text-white">Current image</div>
 
-  <div formArrayName="nearby" class="mt-3 space-y-3">
-    <div
-      *ngFor="let n of nearby.controls; let i = index"
-      [formGroupName]="i"
-      class="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
-    >
-      <div class="grid gap-3 md:grid-cols-2">
-        <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Name *</label>
-          <input class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                 formControlName="name" />
-        </div>
+    <div class="relative max-w-xs">
+      <img
+        [src]="r.get('image')?.value"
+        class="h-40 w-full rounded-xl object-cover border border-gray-200 dark:border-gray-800"
+        alt="room existing"
+      />
 
-        <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Distance</label>
-          <input class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                 formControlName="distance" />
-        </div>
-      </div>
-
-      <div class="mt-3 flex justify-end">
-        <button type="button" (click)="removeNearby(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
-          Remove
-        </button>
-      </div>
+      <button
+        type="button"
+        (click)="deleteRoomImage(i)"
+        class="absolute top-2 right-2 px-2 py-1 text-xs rounded bg-red-600 text-white"
+      >
+        Delete current
+      </button>
     </div>
   </div>
-</div>
 
-<div class="mt-6">
-  <div class="flex items-center justify-between">
-    <h3 class="text-base font-semibold text-gray-900 dark:text-white">FAQ</h3>
-    <button type="button" (click)="addFaq()" class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white">
-      + Add FAQ
-    </button>
-  </div>
+  <!-- SELECTED PREVIEW -->
+  <div class="mt-3" *ngIf="roomPreviewUrl[i]">
+    <div class="mb-2 text-xs font-medium text-gray-900 dark:text-white">Selected image</div>
 
-  <div formArrayName="faq" class="mt-3 space-y-3">
-    <div
-      *ngFor="let f of faq.controls; let i = index"
-      [formGroupName]="i"
-      class="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
-    >
-      <label class="text-sm text-gray-600 dark:text-gray-300">Question *</label>
-      <input class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-             formControlName="question" />
+    <div class="relative max-w-xs">
+      <img
+        [src]="roomPreviewUrl[i]"
+        class="h-40 w-full rounded-xl object-cover border border-gray-200 dark:border-gray-800"
+        alt="room preview"
+      />
 
-      <label class="text-sm text-gray-600 dark:text-gray-300 mt-3 block">Answer *</label>
-      <textarea rows="2"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                formControlName="answer"></textarea>
-
-      <div class="mt-3 flex justify-end">
-        <button type="button" (click)="removeFaq(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
-          Remove
-        </button>
-      </div>
+      <button
+        type="button"
+        (click)="clearRoomSelected(i)"
+        class="absolute top-2 right-2 px-2 py-1 text-xs rounded bg-gray-900/80 text-white"
+      >
+        Remove selected
+      </button>
     </div>
   </div>
-</div>
 
-<div class="mt-6">
-  <div class="flex items-center justify-between">
-    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Programme</h3>
-    <button type="button" (click)="addProgramme()" class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white">
-      + Add Day
-    </button>
-  </div>
-
-  <div formArrayName="programme" class="mt-3 space-y-3">
-    <div
-      *ngFor="let p of programme.controls; let i = index"
-      [formGroupName]="i"
-      class="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
-    >
-      <div class="grid gap-3 md:grid-cols-2">
-        <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Day *</label>
-          <input type="number"
-                 class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                 formControlName="day" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-600 dark:text-gray-300">Activity *</label>
-          <input class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                 formControlName="activity" />
-        </div>
-      </div>
-
-      <div class="mt-3 flex justify-end">
-        <button type="button" (click)="removeProgramme(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
-          Remove
-        </button>
-      </div>
-    </div>
+  <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+    Selecting a new image replaces the old one after Save.
   </div>
 </div>
 
 
+          <div>
+            <label class="text-sm text-gray-600 dark:text-gray-300">Capacity</label>
+            <input
+              type="number"
+              class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+              formControlName="capacity"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm text-gray-600 dark:text-gray-300">Price</label>
+            <input
+              type="number"
+              class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+              formControlName="price"
+            />
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="text-sm text-gray-600 dark:text-gray-300">Description</label>
+          <textarea
+            rows="2"
+            class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+            formControlName="description"
+          ></textarea>
+        </div>
+
+        <div class="mt-3 flex justify-end">
+          <button type="button" (click)="removeRoom(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEARBY -->
+  <div class="mt-6">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-semibold text-gray-900 dark:text-white">Nearby</h3>
+      <button type="button" (click)="addNearby()" class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white">
+        + Add Nearby
+      </button>
+    </div>
+
+    <div formArrayName="nearby" class="mt-3 space-y-3">
+      <div
+        *ngFor="let n of nearby.controls; let i = index"
+        [formGroupName]="i"
+        class="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+      >
+        <div class="grid gap-3 md:grid-cols-2">
+          <div>
+            <label class="text-sm text-gray-600 dark:text-gray-300">Name *</label>
+            <input
+              class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+              formControlName="name"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm text-gray-600 dark:text-gray-300">Distance</label>
+            <input
+              class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+              formControlName="distance"
+            />
+          </div>
+        </div>
+
+        <div class="mt-3 flex justify-end">
+          <button type="button" (click)="removeNearby(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="mt-6">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-semibold text-gray-900 dark:text-white">FAQ</h3>
+      <button type="button" (click)="addFaq()" class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white">
+        + Add FAQ
+      </button>
+    </div>
+
+    <div formArrayName="faq" class="mt-3 space-y-3">
+      <div
+        *ngFor="let f of faq.controls; let i = index"
+        [formGroupName]="i"
+        class="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+      >
+        <label class="text-sm text-gray-600 dark:text-gray-300">Question *</label>
+        <input
+          class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+          formControlName="question"
+        />
+
+        <label class="text-sm text-gray-600 dark:text-gray-300 mt-3 block">Answer *</label>
+        <textarea
+          rows="2"
+          class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+          formControlName="answer"
+        ></textarea>
+
+        <div class="mt-3 flex justify-end">
+          <button type="button" (click)="removeFaq(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRAMME -->
+  <div class="mt-6">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-semibold text-gray-900 dark:text-white">Programme</h3>
+      <button type="button" (click)="addProgramme()" class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white">
+        + Add Day
+      </button>
+    </div>
+
+    <div formArrayName="programme" class="mt-3 space-y-3">
+      <div
+        *ngFor="let p of programme.controls; let i = index"
+        [formGroupName]="i"
+        class="rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+      >
+        <div class="grid gap-3 md:grid-cols-2">
+          <div>
+            <label class="text-sm text-gray-600 dark:text-gray-300">Day *</label>
+            <input
+              type="number"
+              class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+              formControlName="day"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm text-gray-600 dark:text-gray-300">Activity *</label>
+            <input
+              class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+              formControlName="activity"
+            />
+          </div>
+        </div>
+
+        <div class="mt-3 flex justify-end">
+          <button type="button" (click)="removeProgramme(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </form>

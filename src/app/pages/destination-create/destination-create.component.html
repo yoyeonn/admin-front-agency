@@ -41,66 +41,138 @@
 
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Country</label>
-      <input type="text" class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-             formControlName="country" />
+      <input
+        type="text"
+        class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+        formControlName="country"
+      />
     </div>
 
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Location</label>
-      <input type="text" class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-             formControlName="location" />
+      <input
+        type="text"
+        class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+        formControlName="location"
+      />
     </div>
 
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Title</label>
-      <input type="text" class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-             formControlName="title" />
+      <input
+        type="text"
+        class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+        formControlName="title"
+      />
     </div>
 
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Price</label>
-      <input type="number" class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-             formControlName="price" />
+      <input
+        type="number"
+        class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+        formControlName="price"
+      />
     </div>
 
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Days</label>
-      <input type="number" class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-             formControlName="days" />
+      <input
+        type="number"
+        class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+        formControlName="days"
+      />
     </div>
 
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Available From</label>
-      <input type="date" class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-             formControlName="availableFrom" />
+      <input
+        type="date"
+        class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+        formControlName="availableFrom"
+      />
     </div>
 
     <div>
       <label class="text-sm text-gray-600 dark:text-gray-300">Available To</label>
-      <input type="date" class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-             formControlName="availableTo" />
+      <input
+        type="date"
+        class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
+        formControlName="availableTo"
+      />
     </div>
   </div>
 
   <div class="mt-4">
     <label class="text-sm text-gray-600 dark:text-gray-300">Description</label>
-    <textarea rows="3"
+    <textarea
+      rows="3"
       class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-      formControlName="description"></textarea>
+      formControlName="description"
+    ></textarea>
   </div>
 
   <div class="mt-4">
     <label class="text-sm text-gray-600 dark:text-gray-300">About</label>
-    <textarea rows="4"
+    <textarea
+      rows="4"
       class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-      formControlName="about"></textarea>
+      formControlName="about"
+    ></textarea>
   </div>
 
-  <div class="mt-4">
-    <label class="text-sm text-gray-600 dark:text-gray-300">Images URLs (comma separated)</label>
-    <textarea rows="3"
-      class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-      formControlName="imagesText"></textarea>
+  <!-- ✅ IMAGES UPLOAD LIKE HOTEL -->
+  <div class="mt-5">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-semibold text-gray-900 dark:text-white">Images</h3>
+
+      <input
+        #fileInput
+        type="file"
+        multiple
+        accept="image/*"
+        class="hidden"
+        (change)="onFilesSelected($event.target.files)"
+      />
+
+      <button
+        type="button"
+        (click)="fileInput.click()"
+        class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white"
+      >
+        Choose images
+      </button>
+    </div>
+
+    <div
+      class="mt-3 rounded-xl border-2 border-dashed border-gray-200 p-6 text-center dark:border-gray-800"
+      (drop)="onDrop($event)"
+      (dragover)="onDragOver($event)"
+    >
+      <div class="text-sm text-gray-600 dark:text-gray-300">
+        Drag & drop images here, or click “Choose images”
+      </div>
+      <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        You can upload multiple images
+      </div>
+    </div>
+
+    <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" *ngIf="previewUrls.length > 0">
+      <div *ngFor="let url of previewUrls; let i = index" class="relative">
+        <img
+          [src]="url"
+          class="h-40 w-full rounded-xl object-cover border border-gray-200 dark:border-gray-800"
+          alt="preview"
+        />
+        <button
+          type="button"
+          (click)="removeSelectedImage(i)"
+          class="absolute top-2 right-2 px-2 py-1 text-xs rounded bg-red-600 text-white"
+        >
+          Remove
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Activities -->
@@ -196,48 +268,6 @@
 
         <div class="mt-3 flex justify-end">
           <button type="button" (click)="removeFaq(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
-            Remove
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Reviews -->
-  <div class="mt-6">
-    <div class="flex items-center justify-between">
-      <h3 class="text-base font-semibold text-gray-900 dark:text-white">Reviews</h3>
-      <button type="button" (click)="addReview()" class="px-3 py-2 text-xs rounded-lg bg-brand-500 text-white">
-        + Add Review
-      </button>
-    </div>
-
-    <div formArrayName="reviews" class="mt-3 space-y-3">
-      <div *ngFor="let r of reviews.controls; let i = index" [formGroupName]="i"
-           class="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
-        <div class="grid gap-3 md:grid-cols-2">
-          <div>
-            <label class="text-sm text-gray-600 dark:text-gray-300">Name *</label>
-            <input class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-                   formControlName="name" />
-          </div>
-          <div>
-            <label class="text-sm text-gray-600 dark:text-gray-300">Stars</label>
-            <input type="number" min="0" max="5"
-              class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-              formControlName="stars" />
-          </div>
-        </div>
-
-        <div class="mt-3">
-          <label class="text-sm text-gray-600 dark:text-gray-300">Comment</label>
-          <textarea rows="2"
-            class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-            formControlName="comment"></textarea>
-        </div>
-
-        <div class="mt-3 flex justify-end">
-          <button type="button" (click)="removeReview(i)" class="px-3 py-2 text-xs rounded-lg bg-red-600 text-white">
             Remove
           </button>
         </div>

@@ -85,11 +85,11 @@
 
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <img
-          *ngFor="let img of hotel.images"
-          [src]="img"
-          alt="hotel image"
-          class="h-40 w-full rounded-xl object-cover border border-gray-200 dark:border-gray-800"
-        />
+  *ngFor="let img of hotel.images"
+  [src]="imgUrl(img)"
+  alt="hotel image"
+  class="h-40 w-full rounded-xl object-cover border border-gray-200 dark:border-gray-800"
+/>
       </div>
     </div>
   </div>

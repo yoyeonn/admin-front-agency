@@ -1,13 +1,24 @@
 <div class="mb-4 flex items-center justify-between">
   <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Create Pack</h2>
+  <div class="flex gap-2">
+    <a
+      routerLink="/packs"
+      class="px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/[0.05]"
+    >
+      Cancel
+    </a>
 
-  <a
-    routerLink="/packs"
-    class="px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/[0.05]"
-  >
-    Back
-  </a>
+    <button
+      type="button"
+      (click)="save()"
+      [disabled]="saving"
+      class="px-4 py-2 text-sm rounded-lg bg-brand-500 text-white disabled:opacity-60"
+    >
+      {{ saving ? 'Saving...' : 'Save' }}
+    </button>
+  </div>
 </div>
+      
 
 <div *ngIf="error" class="text-red-500 mb-3">{{ error }}</div>
 
@@ -87,12 +98,7 @@
       </div>
     </div>
 
-    <div>
-      <label class="text-sm text-gray-600 dark:text-gray-300">Images (comma separated)</label>
-      <input formControlName="imagesText"
-        placeholder="https://.../1.jpg, https://.../2.jpg"
-        class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-white/[0.03] dark:text-white" />
-    </div>
+   
 
     <div class="grid gap-4 lg:grid-cols-2">
       <div>
@@ -241,14 +247,6 @@
 
 
     <!-- ACTIONS -->
-    <div class="flex items-center justify-end gap-2">
-      <button
-        type="submit"
-        [disabled]="saving"
-        class="px-4 py-2 text-sm rounded-lg bg-brand-500 text-white disabled:opacity-60"
-      >
-        {{ saving ? 'Saving...' : 'Save' }}
-      </button>
-    </div>
+    
   </form>
 </div>

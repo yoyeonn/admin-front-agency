@@ -6,19 +6,16 @@ export const adminGuard: CanActivateFn = () => {
   const auth = inject(AdminAuthService);
   const router = inject(Router);
 
-  const token = localStorage.getItem('token');
-  const role = localStorage.getItem('role');
-
-  if (!token) {
-    router.navigateByUrl('/signin');
+  if (!auth.isLoggedIn()) {
+    router.navigate(['/signin']);
     return false;
   }
 
-  if (role !== 'ROLE_ADMIN') {
-    auth.logout();
-    router.navigateByUrl('/signin');
+  if (auth.role() !== 'ROLE_ADMIN') {
+    router.navigate(['/signin']);
     return false;
   }
 
   return true;
 };
+

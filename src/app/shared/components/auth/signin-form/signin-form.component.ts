@@ -49,23 +49,23 @@ export class SigninFormComponent {
 
     this.loading = true;
 
-    this.auth.login(this.email, this.password).subscribe({
-      next: (res) => {
-        this.loading = false;
+    this.auth.login(this.email, this.password, this.isChecked).subscribe({
+  next: (res) => {
+    this.loading = false;
 
-        // ✅ Only admins allowed
-        if (res.role !== 'ROLE_ADMIN') {
-          this.error = 'Access denied: admin only.';
-          this.auth.logout();
-          return;
-        }
+    if (res.role !== 'ROLE_ADMIN') {
+      this.error = 'Access denied: admin only.';
+      this.auth.logout();
+      return;
+    }
 
-        this.router.navigateByUrl('/');
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = err?.error || 'Login failed';
-      },
-    });
+    this.router.navigateByUrl('/');
+  },
+  error: (err) => {
+    this.loading = false;
+    this.error = err?.error || 'Login failed';
+  },
+});
+
   }
 }

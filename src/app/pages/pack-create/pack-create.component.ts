@@ -48,8 +48,6 @@ form!: FormGroup;
       description: [''],
       about: [''],
 
-      imagesText: [''],
-
       hotelId: [null, Validators.required],
       destinationId: [null, Validators.required],
 

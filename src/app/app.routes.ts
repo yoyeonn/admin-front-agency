@@ -34,6 +34,9 @@ import { ReservationDetailComponent } from './pages/reservation-detail/reservati
 import { DestinationReservationDetailComponent } from './pages/destination-reservation-detail/destination-reservation-detail.component';
 import { PackReservationDetailComponent } from './pages/pack-reservation-detail/pack-reservation-detail.component';
 import { adminGuard } from './shared/guards/admin.guard';
+import { ForgotPasswordComponent } from './pages/auth-pages/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './pages/auth-pages/reset-password/reset-password.component';
+
 
 export const routes: Routes = [
   {
@@ -46,17 +49,17 @@ export const routes: Routes = [
         component: EcommerceComponent,
         pathMatch: 'full',
         title:
-          'Angular Ecommerce Dashboard | TailAdmin - Angular Admin Dashboard Template',
+          'Admin Dashboard',
       },
       {
         path:'calendar',
         component:CalenderComponent,
-        title:'Angular Calender | TailAdmin - Angular Admin Dashboard Template'
+        title:'Calender'
       },
       {
         path: 'hotels',
         component: HotelsComponent,
-        title: 'Hotels | TailAdmin',
+        title: 'Hotels',
       },
       {
         path: 'hotels/create',
@@ -66,17 +69,17 @@ export const routes: Routes = [
       {
         path: 'hotels/:id',
         component: HotelDetailComponent,
-        title: 'Hotel Details | TailAdmin',
+        title: 'Hotel Details',
       },
       {
         path: 'hotels/:id/edit',
         component: HotelEditComponent,
-        title: 'Edit Hotel | TailAdmin',
+        title: 'Edit Hotel',
       },
       {
         path: 'destinations',
         component: DestinationsComponent,
-        title: 'Destinations | TailAdmin',
+        title: 'Destinations',
       },
       {
         path: 'destinations/create',
@@ -86,17 +89,17 @@ export const routes: Routes = [
       {
         path: 'destinations/:id',
         component: DestinationDetailComponent,
-        title: 'Destination Details | TailAdmin',
+        title: 'Destination Details',
       },
       {
         path: 'destinations/:id/edit',
         component: DestinationEditComponent,
-        title: 'Edit Destination | TailAdmin',
+        title: 'Edit Destination',
       },
       {
         path: 'packs',
         component: PacksComponent,
-        title: 'Packs | TailAdmin',
+        title: 'Packs',
       },
       {
         path: 'packs/create',
@@ -116,27 +119,27 @@ export const routes: Routes = [
       {
         path: 'reservations',
         component: ReservationsComponent,
-        title: 'Reservations | TailAdmin',
+        title: 'Reservations',
       },
       {
         path: 'reservations/:id',
         component: ReservationDetailComponent,
-        title: 'Reservation Details | TailAdmin',
+        title: 'Reservation Details',
       },
       {
         path: 'destination-reservations/:id',
         component: DestinationReservationDetailComponent,
-        title: 'Destination Reservation Details | TailAdmin',
+        title: 'Destination Reservation Details',
       },
       {
         path: 'pack-reservations/:id',
         component: PackReservationDetailComponent,
-        title: 'Pack Reservation Details | TailAdmin',
+        title: 'Pack Reservation Details',
       },
       {
         path:'profile',
         component:ProfileComponent,
-        title:'Angular Profile Dashboard | TailAdmin - Angular Admin Dashboard Template'
+        title:'Profile'
       },
       {
         path:'form-elements',
@@ -205,12 +208,22 @@ export const routes: Routes = [
   {
     path:'signin',
     component:SignInComponent,
-    title:'Angular Sign In Dashboard | TailAdmin - Angular Admin Dashboard Template'
+    title:'Sign In'
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+    title: 'Forgot Password'
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent,
+    title: 'Reset Password'
   },
   // error pages
   {
     path:'**',
     component:NotFoundComponent,
-    title:'Angular NotFound Dashboard | TailAdmin - Angular Admin Dashboard Template'
+    title:'NotFound'
   },
 ];

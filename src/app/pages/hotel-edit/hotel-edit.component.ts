@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HotelService } from '../../shared/services/hotel.service';
@@ -11,15 +11,23 @@ import { HotelDTO } from '../../shared/models/hotel-dto';
   templateUrl: './hotel-edit.component.html',
   styleUrl: './hotel-edit.component.css',
 })
-export class HotelEditComponent implements OnInit {
-id!: number;
+export class HotelEditComponent implements OnInit, OnDestroy {
+  id!: number;
   loading = false;
   saving = false;
   error: string | null = null;
-  
-  // Keep the loaded hotel (optional)
+
   hotel: HotelDTO | null = null;
   form!: FormGroup;
+
+  // ✅ Hotel image: 1 file only
+  selectedImages: File[] = [];
+  previewUrls: string[] = [];
+
+  // ✅ Room images: 1 per room index
+  roomSelectedFile: Record<number, File | null> = {};
+  roomPreviewUrl: Record<number, string> = {};
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -35,23 +43,21 @@ id!: number;
       this.error = 'Invalid hotel id';
       return;
     }
-    
+
     this.form = this.fb.group({
       name: ['', Validators.required],
       description: [''],
       location: [''],
       city: [''],
       country: [''],
-      stars: [''], // string in your DTO
-      days: [''],  // string in your DTO
+      stars: [''],
+      days: [''],
       about: [''],
       cancellationPolicy: [''],
       availableDates: [''],
       bestTimeToVisit: [''],
 
-      // list fields as comma-separated text (easy to edit)
       highlightsText: [''],
-      imagesText: [''],
       includesText: [''],
       excludesText: [''],
       suitedForText: [''],
@@ -62,59 +68,99 @@ id!: number;
       faq: this.fb.array([]),
       programme: this.fb.array([]),
     });
+
     this.fetchHotel();
   }
 
-  get rooms(): FormArray { return this.form.get('rooms') as FormArray; }
-get nearby(): FormArray { return this.form.get('nearby') as FormArray; }
-get faq(): FormArray { return this.form.get('faq') as FormArray; }
-get programme(): FormArray { return this.form.get('programme') as FormArray; }
+  ngOnDestroy(): void {
+    this.previewUrls.forEach((u) => URL.revokeObjectURL(u));
+    Object.values(this.roomPreviewUrl).forEach((u) => u && URL.revokeObjectURL(u));
+  }
 
-newRoom(r?: any): FormGroup {
-  return this.fb.group({
-    id: [r?.id ?? null],              // keep for edit
-    name: [r?.name ?? '', Validators.required],
-    image: [r?.image ?? ''],
-    description: [r?.description ?? ''],
-    capacity: [r?.capacity ?? 1],
-    price: [r?.price ?? 0],
+  get rooms(): FormArray {
+    return this.form.get('rooms') as FormArray;
+  }
+  get nearby(): FormArray {
+    return this.form.get('nearby') as FormArray;
+  }
+  get faq(): FormArray {
+    return this.form.get('faq') as FormArray;
+  }
+  get programme(): FormArray {
+    return this.form.get('programme') as FormArray;
+  }
+
+  newRoom(r?: any): FormGroup {
+    return this.fb.group({
+      id: [r?.id ?? null],
+      name: [r?.name ?? '', Validators.required],
+      image: [r?.image ?? ''], // stored URL from backend
+      description: [r?.description ?? ''],
+      capacity: [r?.capacity ?? 1],
+      price: [r?.price ?? 0],
+    });
+  }
+
+  newNearby(n?: any): FormGroup {
+    return this.fb.group({
+      name: [n?.name ?? '', Validators.required],
+      distance: [n?.distance ?? ''],
+    });
+  }
+
+  newFaq(f?: any): FormGroup {
+    return this.fb.group({
+      question: [f?.question ?? '', Validators.required],
+      answer: [f?.answer ?? '', Validators.required],
+      open: [f?.open ?? false],
+    });
+  }
+
+  newProgramme(p?: any): FormGroup {
+    return this.fb.group({
+      day: [p?.day ?? 1, Validators.required],
+      activity: [p?.activity ?? '', Validators.required],
+    });
+  }
+
+  addRoom() {
+    this.rooms.push(this.newRoom());
+  }
+  removeRoom(i: number) {
+    // cleanup room preview if exists
+    this.clearRoomSelected(i);
+    this.rooms.removeAt(i);
+  }
+
+  addNearby() {
+    this.nearby.push(this.newNearby());
+  }
+  removeNearby(i: number) {
+    this.nearby.removeAt(i);
+  }
+
+  addFaq() {
+    this.faq.push(this.newFaq());
+  }
+  removeFaq(i: number) {
+    this.faq.removeAt(i);
+  }
+
+  addProgramme() {
+    const lastDay =
+    this.programme.length > 0
+      ? Number(this.programme.at(this.programme.length - 1).get('day')?.value ?? this.programme.length)
+      : 0;
+
+  this.programme.push(this.newProgramme({ day: lastDay + 1 }));
+  }
+  removeProgramme(i: number) {
+    this.programme.removeAt(i);
+
+  this.programme.controls.forEach((ctrl, idx) => {
+    ctrl.get('day')?.setValue(idx + 1);
   });
-}
-
-newNearby(n?: any): FormGroup {
-  return this.fb.group({
-    name: [n?.name ?? '', Validators.required],
-    distance: [n?.distance ?? ''],
-  });
-}
-
-newFaq(f?: any): FormGroup {
-  return this.fb.group({
-    question: [f?.question ?? '', Validators.required],
-    answer: [f?.answer ?? '', Validators.required],
-    open: [f?.open ?? false],
-  });
-}
-
-newProgramme(p?: any): FormGroup {
-  return this.fb.group({
-    day: [p?.day ?? 1, Validators.required],
-    activity: [p?.activity ?? '', Validators.required],
-  });
-}
-
-addRoom() { this.rooms.push(this.newRoom()); }
-removeRoom(i: number) { this.rooms.removeAt(i); }
-
-addNearby() { this.nearby.push(this.newNearby()); }
-removeNearby(i: number) { this.nearby.removeAt(i); }
-
-addFaq() { this.faq.push(this.newFaq()); }
-removeFaq(i: number) { this.faq.removeAt(i); }
-
-addProgramme() { this.programme.push(this.newProgramme()); }
-removeProgramme(i: number) { this.programme.removeAt(i); }
-
+  }
 
   fetchHotel(): void {
     this.loading = true;
@@ -136,27 +182,22 @@ removeProgramme(i: number) { this.programme.removeAt(i); }
           cancellationPolicy: hotel.cancellationPolicy ?? '',
           availableDates: hotel.availableDates ?? '',
           bestTimeToVisit: hotel.bestTimeToVisit ?? '',
-
           highlightsText: (hotel.highlights ?? []).join(', '),
-          imagesText: (hotel.images ?? []).join(', '),
           includesText: (hotel.includes ?? []).join(', '),
           excludesText: (hotel.excludes ?? []).join(', '),
           suitedForText: (hotel.suitedFor ?? []).join(', '),
           travelTipsText: (hotel.travelTips ?? []).join(', '),
         });
 
-        // clear arrays
-          this.rooms.clear();
-          this.nearby.clear();
-          this.faq.clear();
-          this.programme.clear();
+        this.rooms.clear();
+        this.nearby.clear();
+        this.faq.clear();
+        this.programme.clear();
 
-          // fill from backend
-          (hotel.rooms ?? []).forEach(r => this.rooms.push(this.newRoom(r)));
-          (hotel.nearby ?? []).forEach(n => this.nearby.push(this.newNearby(n)));
-          (hotel.faq ?? []).forEach(f => this.faq.push(this.newFaq(f)));
-          (hotel.programme ?? []).forEach(p => this.programme.push(this.newProgramme(p)));
-
+        (hotel.rooms ?? []).forEach((r) => this.rooms.push(this.newRoom(r)));
+        (hotel.nearby ?? []).forEach((n) => this.nearby.push(this.newNearby(n)));
+        (hotel.faq ?? []).forEach((f) => this.faq.push(this.newFaq(f)));
+        (hotel.programme ?? []).forEach((p) => this.programme.push(this.newProgramme(p)));
 
         this.loading = false;
       },
@@ -172,8 +213,120 @@ removeProgramme(i: number) { this.programme.removeAt(i); }
     if (!s) return [];
     return s
       .split(',')
-      .map(x => x.trim())
+      .map((x) => x.trim())
       .filter(Boolean);
+  }
+
+  // ✅ Hotel image: allow only 1 file
+  onFilesSelected(files: FileList | null) {
+    if (!files?.length) return;
+
+    const file = files[0];
+
+    // clear old previews
+    this.previewUrls.forEach((u) => URL.revokeObjectURL(u));
+    this.previewUrls = [];
+    this.selectedImages = [];
+
+    this.selectedImages = [file];
+    this.previewUrls = [URL.createObjectURL(file)];
+  }
+
+  removeSelectedImage(i: number) {
+    URL.revokeObjectURL(this.previewUrls[i]);
+    this.previewUrls.splice(i, 1);
+    this.selectedImages.splice(i, 1);
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.onFilesSelected(event.dataTransfer?.files ?? null);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  removeExistingImage(i: number) {
+    if (!this.hotel) return;
+    const ok = confirm('Remove this image?');
+    if (!ok) return;
+
+    this.hotelService.deleteHotelImage(this.id, i).subscribe({
+      next: (updated) => {
+        this.hotel = updated;
+      },
+      error: (err) => {
+        alert(err?.error?.message || err?.message || 'Delete image failed');
+      },
+    });
+  }
+
+  // ✅ Room: select 1 file and preview
+  onRoomFileSelected(roomIndex: number, files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+
+    const old = this.roomPreviewUrl[roomIndex];
+    if (old) URL.revokeObjectURL(old);
+
+    this.roomSelectedFile[roomIndex] = file;
+    this.roomPreviewUrl[roomIndex] = URL.createObjectURL(file);
+  }
+
+  clearRoomSelected(roomIndex: number) {
+    const old = this.roomPreviewUrl[roomIndex];
+    if (old) URL.revokeObjectURL(old);
+
+    this.roomPreviewUrl[roomIndex] = '';
+    this.roomSelectedFile[roomIndex] = null;
+  }
+
+  async uploadRoomImagesAfterSave(): Promise<void> {
+    const uploads: Promise<any>[] = [];
+
+    this.rooms.controls.forEach((ctrl, i) => {
+      const roomId = ctrl.get('id')?.value;
+      const file = this.roomSelectedFile[i];
+
+      if (roomId && file) {
+        uploads.push(this.hotelService.uploadRoomImage(this.id, Number(roomId), file).toPromise());
+      }
+    });
+
+    if (uploads.length > 0) {
+      await Promise.all(uploads);
+    }
+
+    // cleanup previews
+    Object.keys(this.roomPreviewUrl).forEach((k) => {
+      const url = this.roomPreviewUrl[Number(k)];
+      if (url) URL.revokeObjectURL(url);
+    });
+    this.roomPreviewUrl = {};
+    this.roomSelectedFile = {};
+  }
+
+  deleteRoomImage(roomIndex: number) {
+    const roomId = this.rooms.at(roomIndex).get('id')?.value;
+    if (!roomId) return;
+
+    const ok = confirm('Delete this room image?');
+    if (!ok) return;
+
+    this.hotelService.deleteRoomImage(this.id, Number(roomId)).subscribe({
+      next: (updated) => {
+        this.hotel = updated;
+
+        const roomForm = this.rooms.at(roomIndex);
+        roomForm.patchValue({ image: '' });
+
+        this.clearRoomSelected(roomIndex);
+      },
+      error: (err) => {
+        alert(err?.error?.message || err?.message || 'Delete room image failed');
+      },
+    });
   }
 
   save(): void {
@@ -201,7 +354,6 @@ removeProgramme(i: number) { this.programme.removeAt(i); }
       bestTimeToVisit: v.bestTimeToVisit ?? '',
 
       highlights: this.csvToList(v.highlightsText),
-      images: this.csvToList(v.imagesText),
       includes: this.csvToList(v.includesText),
       excludes: this.csvToList(v.excludesText),
       suitedFor: this.csvToList(v.suitedForText),
@@ -214,9 +366,27 @@ removeProgramme(i: number) { this.programme.removeAt(i); }
     };
 
     this.hotelService.updateHotel(this.id, payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.router.navigate(['/hotels', this.id]); // go back to details
+      next: async () => {
+        try {
+          // ✅ upload hotel image (if selected)
+          if (this.selectedImages.length > 0) {
+            await this.hotelService.uploadHotelImages(this.id, this.selectedImages).toPromise();
+
+            // cleanup hotel previews
+            this.previewUrls.forEach((u) => URL.revokeObjectURL(u));
+            this.previewUrls = [];
+            this.selectedImages = [];
+          }
+
+          // ✅ upload room images (if selected)
+          await this.uploadRoomImagesAfterSave();
+
+          this.saving = false;
+          this.router.navigate(['/hotels', this.id]);
+        } catch (err: any) {
+          this.saving = false;
+          this.error = err?.error?.message || err?.message || 'Upload failed';
+        }
       },
       error: (err) => {
         this.saving = false;

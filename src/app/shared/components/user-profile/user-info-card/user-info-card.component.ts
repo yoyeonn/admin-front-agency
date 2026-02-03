@@ -1,47 +1,44 @@
-import { Component } from '@angular/core';
-import { ModalService } from '../../../services/modal.service';
-
-import { InputFieldComponent } from '../../form/input/input-field.component';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { AdminProfile, AdminProfileService } from '../../../services/admin-profile.service';
+import { ModalComponent } from '../../ui/modal/modal.component';
 import { ButtonComponent } from '../../ui/button/button.component';
 import { LabelComponent } from '../../form/label/label.component';
-import { ModalComponent } from '../../ui/modal/modal.component';
+import { InputFieldComponent } from '../../form/input/input-field.component';
+
 
 @Component({
   selector: 'app-user-info-card',
-  imports: [
-    InputFieldComponent,
-    ButtonComponent,
-    LabelComponent,
-    ModalComponent
-],
+  standalone: true,
+  imports: [ModalComponent, ButtonComponent, FormsModule, LabelComponent, InputFieldComponent],
   templateUrl: './user-info-card.component.html',
-  styles: ``
 })
 export class UserInfoCardComponent {
-
-  constructor(public modal: ModalService) {}
+  @Input() profile!: AdminProfile;
+  @Output() profileUpdated = new EventEmitter<AdminProfile>();
 
   isOpen = false;
-  openModal() { this.isOpen = true; }
-  closeModal() { this.isOpen = false; }
+  editName = '';
 
-  user = {
-    firstName: 'Musharof',
-    lastName: 'Chowdhury',
-    email: 'randomuser@pimjo.com',
-    phone: '+09 363 398 46',
-    bio: 'Team Manager',
-    social: {
-      facebook: 'https://www.facebook.com/PimjoHQ',
-      x: 'https://x.com/PimjoHQ',
-      linkedin: 'https://www.linkedin.com/company/pimjo',
-      instagram: 'https://instagram.com/PimjoHQ',
-    },
-  };
+  constructor(private adminProfileService: AdminProfileService) {}
+
+
+  openModal() {
+    this.editName = this.profile?.name ?? '';
+    this.isOpen = true;
+  }
+
+  closeModal() {
+    this.isOpen = false;
+  }
 
   handleSave() {
-    // Handle save logic here
-    console.log('Saving changes...');
-    this.modal.closeModal();
+    this.adminProfileService.updateMyProfile({ name: this.editName }).subscribe({
+      next: (updated: AdminProfile) => {
+        this.profileUpdated.emit(updated);
+        this.closeModal();
+      },
+      error: (err: unknown) => console.error(err),
+    });
   }
 }

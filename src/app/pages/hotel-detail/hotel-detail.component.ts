@@ -80,4 +80,15 @@ firstRoomPrice(): number {
   return Number(rooms[0]?.price || 0);
 }
 
+cloudinaryBase = 'https://res.cloudinary.com/<YOUR_CLOUD_NAME>/image/upload/';
+
+imgUrl(img: string): string {
+  if (!img) return '';
+
+  // if already full url, keep it
+  if (img.startsWith('http')) return img;
+
+  // otherwise treat it as Cloudinary public_id or filename
+  return this.cloudinaryBase + img;
+}
 }
