@@ -102,7 +102,7 @@ uploadImage() {
   const url = this.profile?.imageUrl;
   if (!url) return '/images/user/owner.jpg';
 
-  // If backend returns Cloudinary URL (https://...), use it as-is
+  // If backend returns Cloudinary URL (https://...), 
   if (url.startsWith('http')) return url;
 
   // If backend returns relative path (/uploads/...), prefix backend host

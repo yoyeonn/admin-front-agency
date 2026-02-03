@@ -42,7 +42,7 @@ export class ReservationsComponent implements OnInit {
     forkJoin({
       hotels: this.reservationService.getAllAdmin(),
       dests: this.reservationService.getAllAdminDestinations(),
-      packs: this.reservationService.getAllAdminPacks(), // ✅ NEW
+      packs: this.reservationService.getAllAdminPacks(),
     }).subscribe({
       next: ({ hotels, dests, packs }) => {
         this.hotelItems = hotels ?? [];

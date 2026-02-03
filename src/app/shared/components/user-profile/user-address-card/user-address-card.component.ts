@@ -41,7 +41,7 @@ export class UserAddressCardComponent {
 
   handleSave() {
     this.adminProfileService.updateMyProfile({
-      name: this.profile.name, // keep same name
+      name: this.profile.name,
       country: this.editAddress.country,
       cityState: this.editAddress.cityState,
       postalCode: this.editAddress.postalCode,

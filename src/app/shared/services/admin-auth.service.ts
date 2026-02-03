@@ -29,7 +29,7 @@ export class AdminAuthService {
       const other = remember ? sessionStorage : localStorage;
       other.clear(); // or remove specific keys
     }),
-    // ✅ now fetch profile (includes imageUrl) so header updates immediately
+    // fetch profile (includes imageUrl) so header updates immediately
     switchMap((res) =>
       this.profile.getMyProfile().pipe(
         // return original login response back
@@ -70,7 +70,7 @@ getToken(): string | null {
   return this.http.post(
     'http://localhost:9090/api/auth/forgot-password',
     { email },
-    { responseType: 'text' } // ✅
+    { responseType: 'text' }
   );
 }
 
@@ -78,7 +78,7 @@ resetPassword(token: string, newPassword: string) {
   return this.http.post(
     'http://localhost:9090/api/auth/reset-password',
     { token, newPassword },
-    { responseType: 'text' } // ✅ treat backend response as plain text
+    { responseType: 'text' } // treat backend response as plain text
   );
 }
 

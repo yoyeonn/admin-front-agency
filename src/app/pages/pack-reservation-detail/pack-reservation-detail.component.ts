@@ -144,9 +144,6 @@ export class PackReservationDetailComponent implements OnInit {
     return this.roomRows().reduce((sum, x) => sum + (x.paying || 0), 0);
   }
 
-  /**
-   * If you still store adults/children in DB, we prefer rooms if present.
-   */
   payingPeople(): number {
     const roomsPaying = this.payingPeopleFromRooms();
     if (roomsPaying > 0) return roomsPaying;
@@ -156,7 +153,7 @@ export class PackReservationDetailComponent implements OnInit {
     return (r.adults ?? 0) + (r.children ?? 0);
   }
 
-  /** Best location key: backend uses packLocation in detail, location in invoice */
+  /** backend uses packLocation in detail, location in invoice */
   bestLocation(r: any): string {
     return r?.packLocation ?? r?.location ?? '—';
   }
@@ -186,7 +183,7 @@ export class PackReservationDetailComponent implements OnInit {
 
         const nights = Number(inv.nights ?? this.nights() ?? 0);
 
-        // Prefer computed from invoice, else compute from rooms, else adults/children
+        //computed from invoice, else compute from rooms, else adults/children
         const payingPeople =
           Number(inv.payingPeople ?? 0) ||
           this.payingPeopleFromRooms() ||
@@ -271,7 +268,7 @@ export class PackReservationDetailComponent implements OnInit {
 
         const finalY = (doc as any).lastAutoTable?.finalY || 118;
 
-        // Formula breakdown (THIS IS WHAT YOU WANTED ✅)
+        // Formula breakdown
         autoTable(doc, {
           startY: finalY + 8,
           head: [['Formule', 'Calcul', 'Montant']],

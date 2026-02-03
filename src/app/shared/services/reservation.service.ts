@@ -37,21 +37,21 @@ export class ReservationService {
       .pipe(map((res) => res.data as ReservationDTO));
   }
 
-  // ✅ USER invoice (owner only)
+  // USER invoice (owner only)
   getInvoiceJson(id: number) {
     return this.http.get<any>(`${this.userBaseUrl}/${id}/invoice`, {
       headers: this.authHeaders(),
     });
   }
 
-  // ✅ ADMIN invoice (works in admin reservation detail)
+  // ADMIN invoice
   getInvoiceJsonAdmin(id: number) {
     return this.http.get<any>(`${this.adminBaseUrl}/hotels/${id}/invoice`, {
       headers: this.authHeaders(),
     });
   }
 
-  // ✅ USER pdf (owner only)
+  // USER pdf (owner only)
   downloadInvoicePdf(id: number): Observable<Blob> {
     return this.http.get(`${this.userBaseUrl}/${id}/invoice.pdf`, {
       headers: this.authHeaders(),
@@ -59,7 +59,7 @@ export class ReservationService {
     });
   }
 
-  // ✅ ADMIN pdf (works in admin reservation detail)
+  // ADMIN pdf (works in admin reservation detail)
   downloadInvoicePdfAdmin(id: number): Observable<Blob> {
     return this.http.get(`${this.adminBaseUrl}/hotels/${id}/invoice.pdf`, {
       headers: this.authHeaders(),

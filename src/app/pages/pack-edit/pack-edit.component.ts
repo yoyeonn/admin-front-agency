@@ -190,9 +190,6 @@ id!: number;
 
     const v = this.form.value;
 
-    // IMPORTANT:
-    // This assumes your backend update expects hotelId + destinationId
-    // If your backend expects nested objects instead, tell me and I’ll adapt payload.
     const selectedDest = this.selectedDestination;
 
 const payload: any = {

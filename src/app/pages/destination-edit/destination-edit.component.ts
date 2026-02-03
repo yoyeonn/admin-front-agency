@@ -20,7 +20,6 @@ export class DestinationEditComponent implements OnInit, OnDestroy {
   destination: DestinationDTO | null = null;
   form!: FormGroup;
 
-  // ✅ like hotel
   selectedImages: File[] = [];
   previewUrls: string[] = [];
 
@@ -160,7 +159,7 @@ export class DestinationEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ✅ images handlers (like hotel)
+  // images handlers
   onFilesSelected(files: FileList | null) {
     if (!files?.length) return;
 
@@ -212,7 +211,6 @@ export class DestinationEditComponent implements OnInit, OnDestroy {
 
     const v = this.form.value;
 
-    // ✅ IMPORTANT: do NOT send images in update payload
     const payload: Partial<DestinationDTO> = {
       name: v.name ?? '',
       country: v.country ?? '',

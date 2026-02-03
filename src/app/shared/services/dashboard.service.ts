@@ -20,7 +20,7 @@ export type DashboardData = {
 
   target: number;
   revenueThisMonth: number;
-  todayRevenue: number; // ✅
+  todayRevenue: number;
 
   targetPercent: number;
 

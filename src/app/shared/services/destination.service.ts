@@ -48,14 +48,14 @@ export class DestinationService {
     });
   }
 
-  // ✅ Upload images (like hotel)
+  // Upload images
   uploadDestinationImages(id: number, files: File[]) {
   const form = new FormData();
   files.forEach(f => form.append('files', f));
 
   return this.http
     .post<ApiResponse<DestinationDTO>>(`${this.baseUrl}/${id}/images`, form, {
-      headers: this.authHeaders(), // ✅ don't set Content-Type manually
+      headers: this.authHeaders(),
     })
     .pipe(map(res => res.data));
 }
@@ -68,7 +68,7 @@ deleteDestinationImage(id: number, index: number) {
     .pipe(map(res => res.data));
 }
 
-  // Search endpoint (optional usage)
+  // Search endpoint
   search(q?: string, maxPrice?: number, checkIn?: string, checkOut?: string) {
     const params: any = {};
     if (q) params.q = q;

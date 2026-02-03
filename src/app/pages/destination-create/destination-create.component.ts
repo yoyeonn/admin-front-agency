@@ -17,7 +17,6 @@ export class DestinationCreateComponent implements OnInit, OnDestroy {
   saving = false;
   error: string | null = null;
 
-  // ✅ like hotel
   selectedImages: File[] = [];
   previewUrls: string[] = [];
 
@@ -107,7 +106,7 @@ export class DestinationCreateComponent implements OnInit, OnDestroy {
   addFaq() { this.faq.push(this.newFaq()); }
   removeFaq(i: number) { this.faq.removeAt(i); }
 
-  // ✅ images handlers (like hotel)
+  // images handlers
   onFilesSelected(files: FileList | null) {
     if (!files?.length) return;
 
@@ -143,7 +142,6 @@ export class DestinationCreateComponent implements OnInit, OnDestroy {
 
     const v = this.form.value;
 
-    // ✅ IMPORTANT: do NOT send images from text. Backend images come from upload endpoint.
     const payload: Partial<DestinationDTO> = {
       name: v.name ?? '',
       country: v.country ?? '',
@@ -170,14 +168,14 @@ export class DestinationCreateComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // ✅ no images selected => done
+        // no images selected => done
         if (this.selectedImages.length === 0) {
           this.saving = false;
           this.router.navigate(['/destinations', id]);
           return;
         }
 
-        // ✅ upload images
+        // upload images
         this.destinationService.uploadDestinationImages(id, this.selectedImages).subscribe({
           next: () => {
             this.previewUrls.forEach((u) => URL.revokeObjectURL(u));

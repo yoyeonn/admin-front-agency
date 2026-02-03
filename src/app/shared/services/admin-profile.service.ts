@@ -25,7 +25,6 @@ export class AdminProfileService {
   private setProfile(p: AdminProfile) {
     this.profileSubject.next(p);
 
-    // optional: keep localStorage too
     localStorage.setItem('name', p.name);
     localStorage.setItem('email', p.email);
     if (p.imageUrl) localStorage.setItem('imageUrl', p.imageUrl);

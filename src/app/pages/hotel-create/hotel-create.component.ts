@@ -16,11 +16,10 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
   saving = false;
   error: string | null = null;
 
-  // ✅ Hotel image: 1 only
   selectedImages: File[] = [];
   previewUrls: string[] = [];
 
-  // ✅ Room images: 1 per room index (before creation)
+  // Room images: 1 per room index
   roomSelectedFile: Record<number, File | null> = {};
   roomPreviewUrl: Record<number, string> = {};
 
@@ -82,7 +81,7 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
     return this.fb.group({
       id: [r?.id ?? null],
       name: [r?.name ?? '', Validators.required],
-      image: [''], // keep empty; image is uploaded with endpoint
+      image: [''],
       description: [r?.description ?? ''],
       capacity: [r?.capacity ?? 1],
       price: [r?.price ?? 0],
@@ -158,7 +157,6 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
       .filter(Boolean);
   }
 
-  // ✅ Hotel image: 1 only
   onFilesSelected(files: FileList | null) {
     if (!files?.length) return;
 
@@ -187,7 +185,7 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
     event.preventDefault();
   }
 
-  // ✅ Room: select 1 file and preview
+  // Room: select 1 file and preview
   onRoomFileSelected(roomIndex: number, files: FileList | null) {
     if (!files || files.length === 0) return;
     const file = files[0];
@@ -263,7 +261,6 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
       suitedFor: this.csvToList(v.suitedForText),
       travelTips: this.csvToList(v.travelTipsText),
 
-      // IMPORTANT: do NOT send images list from text input
       rooms: this.rooms.value,
       nearby: this.nearby.value,
       faq: this.faq.value,
@@ -280,7 +277,7 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
         }
 
         try {
-          // ✅ upload hotel image (if selected)
+          // upload hotel image (if selected)
           if (this.selectedImages.length > 0) {
             await this.hotelService.uploadHotelImages(id, this.selectedImages).toPromise();
 
@@ -289,7 +286,7 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
             this.selectedImages = [];
           }
 
-          // ✅ upload room images after create (needs room ids)
+          // upload room images after create (needs room ids)
           await this.uploadRoomImagesAfterCreate(created);
 
           this.saving = false;

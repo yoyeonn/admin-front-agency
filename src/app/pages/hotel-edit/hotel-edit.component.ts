@@ -20,11 +20,10 @@ export class HotelEditComponent implements OnInit, OnDestroy {
   hotel: HotelDTO | null = null;
   form!: FormGroup;
 
-  // ✅ Hotel image: 1 file only
   selectedImages: File[] = [];
   previewUrls: string[] = [];
 
-  // ✅ Room images: 1 per room index
+  // Room images: 1 per room index
   roomSelectedFile: Record<number, File | null> = {};
   roomPreviewUrl: Record<number, string> = {};
 
@@ -217,7 +216,7 @@ export class HotelEditComponent implements OnInit, OnDestroy {
       .filter(Boolean);
   }
 
-  // ✅ Hotel image: allow only 1 file
+  // Hotel image: allow only 1 file
   onFilesSelected(files: FileList | null) {
     if (!files?.length) return;
 
@@ -262,7 +261,7 @@ export class HotelEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ✅ Room: select 1 file and preview
+  // Room: select 1 file and preview
   onRoomFileSelected(roomIndex: number, files: FileList | null) {
     if (!files || files.length === 0) return;
     const file = files[0];
@@ -368,7 +367,7 @@ export class HotelEditComponent implements OnInit, OnDestroy {
     this.hotelService.updateHotel(this.id, payload).subscribe({
       next: async () => {
         try {
-          // ✅ upload hotel image (if selected)
+          // upload hotel image (if selected)
           if (this.selectedImages.length > 0) {
             await this.hotelService.uploadHotelImages(this.id, this.selectedImages).toPromise();
 
@@ -378,7 +377,7 @@ export class HotelEditComponent implements OnInit, OnDestroy {
             this.selectedImages = [];
           }
 
-          // ✅ upload room images (if selected)
+          // upload room images (if selected)
           await this.uploadRoomImagesAfterSave();
 
           this.saving = false;

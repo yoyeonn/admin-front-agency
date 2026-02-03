@@ -88,7 +88,7 @@ export class DestinationReservationDetailComponent implements OnInit {
     const children = r.children ?? 0;
     const people = adults + children;
 
-    // price per person per night if you want to show formula:
+    // price per person per night to show formula:
     // total = price * people * nights => price = total/(people*nights)
     const total = Number(r.totalAmount ?? 0);
     const pricePerPersonPerNight =

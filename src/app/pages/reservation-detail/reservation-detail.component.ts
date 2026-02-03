@@ -40,7 +40,7 @@ loading = false;
       next: async (r) => {
         this.item = r;
 
-        // ✅ fetch hotel for location
+        // fetch hotel for location
         if (this.item?.hotelId) {
           try {
             const hotel = await this.hotelService.getHotelById(this.item.hotelId);
@@ -143,7 +143,6 @@ loading = false;
     return total / n;
   }
 
-  // Optional: if you want "beds total" (rooms only) separate:
   roomsOnlyTotalAllNights(): number {
     const total = this.totalAllNights();
     const formula = this.formulaTotal();
