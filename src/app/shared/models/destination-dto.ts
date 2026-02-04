@@ -29,6 +29,7 @@ export type DestinationDTO = {
   days: number;
 
   location?: string;
+  map?: string;
   title?: string;
 
   description?: string;

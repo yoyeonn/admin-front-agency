@@ -30,9 +30,11 @@
       <div>
         <label class="text-sm text-gray-600 dark:text-gray-300">Hotel *</label>
         <select
-          formControlName="hotelId"
-          class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-white/[0.03] dark:text-white"
-        >
+  formControlName="hotelId"
+  class="mt-1 w-full rounded-lg border px-3 py-2 text-sm
+         bg-white text-gray-900 border-gray-200
+         dark:bg-slate-900 dark:text-white dark:border-gray-700"
+>
           <option [ngValue]="null">Select hotel</option>
           <option *ngFor="let h of hotels" [ngValue]="h.id">
             {{ h.name }} ({{ h.city || '-' }} / {{ h.country || '-' }})
@@ -47,9 +49,11 @@
       <div>
         <label class="text-sm text-gray-600 dark:text-gray-300">Destination *</label>
         <select
-          formControlName="destinationId"
-          class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-800 dark:bg-white/[0.03] dark:text-white"
-        >
+  formControlName="destinationId"
+  class="mt-1 w-full rounded-lg border px-3 py-2 text-sm
+         bg-white text-gray-900 border-gray-200
+         dark:bg-slate-900 dark:text-white dark:border-gray-700"
+>
           <option [ngValue]="null">Select destination</option>
           <option *ngFor="let d of destinations" [ngValue]="d.id">
             {{ d.name }} ({{ d.country }})

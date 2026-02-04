@@ -46,7 +46,7 @@ export class HotelEditComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       name: ['', Validators.required],
       description: [''],
-      location: [''],
+      map: [''],
       city: [''],
       country: [''],
       stars: [''],
@@ -172,7 +172,7 @@ export class HotelEditComponent implements OnInit, OnDestroy {
         this.form.patchValue({
           name: hotel.name ?? '',
           description: hotel.description ?? '',
-          location: hotel.location ?? '',
+          map: hotel.map ?? '',
           city: hotel.city ?? '',
           country: hotel.country ?? '',
           stars: hotel.stars ?? '',
@@ -216,20 +216,17 @@ export class HotelEditComponent implements OnInit, OnDestroy {
       .filter(Boolean);
   }
 
-  // Hotel image: allow only 1 file
   onFilesSelected(files: FileList | null) {
-    if (!files?.length) return;
+  if (!files || files.length === 0) return;
 
-    const file = files[0];
+  this.previewUrls.forEach((u) => URL.revokeObjectURL(u));
+  this.previewUrls = [];
+  this.selectedImages = [];
 
-    // clear old previews
-    this.previewUrls.forEach((u) => URL.revokeObjectURL(u));
-    this.previewUrls = [];
-    this.selectedImages = [];
+  this.selectedImages = Array.from(files);
+  this.previewUrls = this.selectedImages.map((f) => URL.createObjectURL(f));
+}
 
-    this.selectedImages = [file];
-    this.previewUrls = [URL.createObjectURL(file)];
-  }
 
   removeSelectedImage(i: number) {
     URL.revokeObjectURL(this.previewUrls[i]);
@@ -342,7 +339,7 @@ export class HotelEditComponent implements OnInit, OnDestroy {
     const payload: Partial<HotelDTO> = {
       name: v.name ?? '',
       description: v.description ?? '',
-      location: v.location ?? '',
+      map: v.map ?? '',
       city: v.city ?? '',
       country: v.country ?? '',
       stars: v.stars ?? '',

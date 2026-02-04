@@ -43,11 +43,11 @@
     </div>
 
     <div>
-      <label class="text-sm text-gray-600 dark:text-gray-300">Location</label>
+      <label class="text-sm text-gray-600 dark:text-gray-300">Map</label>
       <input
         type="text"
         class="mt-1 w-full rounded-lg border border-gray-200 p-2 dark:border-gray-800 dark:bg-transparent"
-        formControlName="location"
+        formControlName="map"
       />
     </div>
 
@@ -183,7 +183,7 @@
       ></textarea>
     </div>
 
-    <!-- ✅ HOTEL IMAGE (1 ONLY) -->
+    <!-- HOTEL IMAGE -->
     <div class="md:col-span-2 mt-2">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-semibold text-gray-900 dark:text-white">Hotel Image (1)</h3>
@@ -192,6 +192,7 @@
           #fileInput
           type="file"
           accept="image/*"
+          multiple
           class="hidden"
           (change)="onFilesSelected($event.target.files)"
         />

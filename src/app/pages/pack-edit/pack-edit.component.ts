@@ -97,8 +97,21 @@ id!: number;
     });
   }
 
-  addActivity() { this.activities.push(this.newActivity()); }
-  removeActivity(i: number) { this.activities.removeAt(i); }
+  addActivity() {
+  const lastDay =
+    this.activities.length > 0
+      ? Number(this.activities.at(this.activities.length - 1).get('day')?.value ?? this.activities.length)
+      : 0;
+
+  this.activities.push(this.newActivity({ day: lastDay + 1 }));
+}
+  removeActivity(i: number) {
+  this.activities.removeAt(i);
+
+  this.activities.controls.forEach((ctrl, idx) => {
+    ctrl.get('day')?.setValue(idx + 1);
+  });
+}
 
   addFaq() { this.faq.push(this.newFaq()); }
   removeFaq(i: number) { this.faq.removeAt(i); }

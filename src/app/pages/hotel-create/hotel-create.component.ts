@@ -33,7 +33,7 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       name: ['', Validators.required],
       description: [''],
-      location: [''],
+      map: [''],
       city: [''],
       country: [''],
       stars: [''],
@@ -158,17 +158,20 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
   }
 
   onFilesSelected(files: FileList | null) {
-    if (!files?.length) return;
+  if (!files || files.length === 0) return;
 
-    const file = files[0];
+  // cleanup old previews
+  this.previewUrls.forEach((u) => URL.revokeObjectURL(u));
+  this.previewUrls = [];
+  this.selectedImages = [];
 
-    this.previewUrls.forEach((u) => URL.revokeObjectURL(u));
-    this.previewUrls = [];
-    this.selectedImages = [];
+  // take ALL files
+  this.selectedImages = Array.from(files);
 
-    this.selectedImages = [file];
-    this.previewUrls = [URL.createObjectURL(file)];
-  }
+  // preview ALL
+  this.previewUrls = this.selectedImages.map((f) => URL.createObjectURL(f));
+}
+
 
   removeSelectedImage(i: number) {
     URL.revokeObjectURL(this.previewUrls[i]);
@@ -245,7 +248,7 @@ export class HotelCreateComponent implements OnInit, OnDestroy {
     const payload: Partial<HotelDTO> = {
       name: v.name ?? '',
       description: v.description ?? '',
-      location: v.location ?? '',
+      map: v.map ?? '',
       city: v.city ?? '',
       country: v.country ?? '',
       stars: v.stars ?? '',

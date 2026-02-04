@@ -3,7 +3,7 @@ export interface HotelDTO {
   name: string;
   description?: string;
   
-  location?: string;
+  map?: string;
   city?: string;
   country?: string;
 
