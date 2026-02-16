@@ -36,7 +36,6 @@ export class EcommerceComponent implements OnInit {
         this.data = d;
         this.loading = false;
 
-        // Here you also update your chart datasets depending on how TailAdmin charts are built
         // Example:
         // this.monthlySalesValues = d.monthlySales.map(x => x.value);
         // this.monthlySalesLabels = d.monthlySales.map(x => x.label);
